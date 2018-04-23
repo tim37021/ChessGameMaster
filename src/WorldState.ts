@@ -1,5 +1,4 @@
 import {Piece} from "./Piece";
-
 interface IWorldStateCreateInfo {
     dims: [number, number];
 }
