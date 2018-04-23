@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { ChessEditor } from "./ChessEditor";
 import { ModelPreviewer } from "./ModelPreviewer";
 import { PieceState } from "./PieceState";
+import { ImagePicker } from "./ImagePicker";
 
 
 const dialog = remote.dialog;
@@ -11,13 +12,17 @@ const dialog = remote.dialog;
 let stopbtn: HTMLElement;
 let board: ChessEditor;
 let sd: ModelPreviewer;
+let ip: ImagePicker;
 
 function init() {
     const container = document.getElementById("container");
     const stateconatiner = document.getElementById("state-container");
+    const ipcontainer = document.getElementById("ip-container");
     board = new ChessEditor(container, {dims: [8, 8]});
     sd = new ModelPreviewer({width: 256, height: 256});
+    ip = new ImagePicker();
     stateconatiner.appendChild(sd.domElement);
+    ipcontainer.appendChild(ip.domElement);
     stopbtn = document.getElementById("stopbtn");
 }
 
@@ -36,9 +41,11 @@ function load_textures() {
     if (filenames !== undefined) {
         filenames.forEach((filename) => {
             board.registerTexture("UNTITLED", filename);
+            ip.addImage("UNTITLED", filename);
         });
     }
     board.focus();
+    ip.update();
 }
 
 function load_mesh() {
@@ -46,9 +53,11 @@ function load_mesh() {
     if (filenames !== undefined) {
         filenames.forEach((filename) => {
             board.registerTexture("UNTITLED", filename);
+            
         });
     }
-    board.focus();
+    ip.update();
+
 }
 
 window.onload = () => {

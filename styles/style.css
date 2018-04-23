@@ -1,5 +1,55 @@
 .state-container {
     border: black 1px solid;
+}
+
+.image-picker {
+    overflow: hidden;
+}
+
+.image-picker .navigate-left {
+    width: 10%;
+    height: 100%;
+    left: 0;
+    transition: background-color 0.5s ease;
+}
+
+.image-picker .navigate-left:hover {
+    background-color: #f4b342;
+}
+
+.image-picker .navigate-right {
+    width: 10%;
+    height: 100%;
+    right: 0;
+    transition: background-color 0.5s ease;
+}
+
+.image-picker .navigate-right:hover {
+    background-color: #f4b342;
+}
+
+
+.image-picker .images {
+    font: 10px sans-serif;
+    border: black 1px solid;
+    text-align: right;
+    padding: 3px;
+    margin: 10px;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.image-picker div img {
+    width: 100%;
+    height: 100%;
+}
+
+.image-picker .selected {
+    border: 2px blue solid;
+}
+
+.draggable {
     z-index: 1;
     position: absolute;
-}
+}  
