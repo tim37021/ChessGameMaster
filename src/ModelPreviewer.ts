@@ -1,0 +1,70 @@
+import * as THREE from "three";
+import { OrbitControls } from "three-orbitcontrols-ts";
+
+interface IModelPreviewerCreateInfo {
+    width: number;
+    height: number;
+}
+
+export class ModelPreviewer {
+    private renderer: THREE.WebGLRenderer;
+    private scene: THREE.Scene;
+    private camera: THREE.Camera;
+    private controls: OrbitControls;
+
+    constructor(params: IModelPreviewerCreateInfo) {
+        this.init(params);
+    }
+
+    public set mesh(mesh: THREE.Mesh) {
+        if (this.scene.children.length > 2) {
+            this.scene.children[2] = mesh;
+        } else {
+            this.scene.add(mesh);
+        }
+    }
+
+    public get mesh(): THREE.Mesh {
+        if (this.scene.children.length > 2) {
+            return this.scene.children[2] as THREE.Mesh;
+        } else {
+            return null;
+        }
+    }
+
+    public get domElement(): HTMLCanvasElement {
+        return this.renderer.domElement;
+    }
+
+    private init(params: IModelPreviewerCreateInfo): void {
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setClearColor(0x000000, 0);
+        // renderer.setClearColor( scene.fog.color );
+        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.setSize(params.width, params.height);
+
+        this.scene = new THREE.Scene();
+        // setup lighting
+        const light = new THREE.DirectionalLight( 0xFFFFFF, 1.0);
+        light.position.set( 1, 1, 1 );
+        this.scene.add( light );
+
+        this.scene.add(new THREE.AxesHelper(100));
+
+        this.camera = new THREE.PerspectiveCamera( 45, 1, 1, 3500 );
+        this.camera.position.z = 250;
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+
+        this.controls.enablePan = false;
+        this.controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+
+        this.renderer.domElement.addEventListener( "mousedown", this.redraw.bind(this), false );
+        this.renderer.domElement.addEventListener( "mousemove", this.redraw.bind(this), false );
+        this.redraw();
+    }
+
+    private redraw(): void {
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+    }
+}
