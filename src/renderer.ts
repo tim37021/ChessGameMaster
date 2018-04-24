@@ -2,10 +2,10 @@ import {remote} from "electron";
 import * as fs from "fs";
 
 import { ChessEditor } from "./ChessEditor";
+
+import { ImagePicker } from "./ImagePicker";
 import { ModelPreviewer } from "./ModelPreviewer";
 import { PieceState } from "./PieceState";
-import { ImagePicker } from "./ImagePicker";
-
 
 const dialog = remote.dialog;
 
@@ -21,6 +21,9 @@ function init() {
     board = new ChessEditor(container, {dims: [8, 8]});
     sd = new ModelPreviewer({width: 256, height: 256});
     ip = new ImagePicker();
+    ip.on("changed", (idx: number) => {
+        board.setEditMaterial(idx);
+    });
     stateconatiner.appendChild(sd.domElement);
     ipcontainer.appendChild(ip.domElement);
     stopbtn = document.getElementById("stopbtn");
@@ -40,6 +43,7 @@ function load_textures() {
     const filenames = dialog.showOpenDialog({properties: ["openFile", "multiSelections"]});
     if (filenames !== undefined) {
         filenames.forEach((filename) => {
+            console.log(filename);
             board.registerTexture("UNTITLED", filename);
             ip.addImage("UNTITLED", filename);
         });
@@ -53,7 +57,6 @@ function load_mesh() {
     if (filenames !== undefined) {
         filenames.forEach((filename) => {
             board.registerTexture("UNTITLED", filename);
-            
         });
     }
     ip.update();

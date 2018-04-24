@@ -62,6 +62,7 @@ export class ChessEditor {
 
     public registerTexture(texname: string, filename: string): void {
         new THREE.TextureLoader().load(filename, (text: THREE.Texture) => {
+            console.log(filename);
             this.textures.push({name: texname, filepath: filename, texture: text});
         });
     }
@@ -90,6 +91,11 @@ export class ChessEditor {
 
     public focus(): void {
         this.renderer.domElement.focus();
+    }
+
+    public setEditMaterial(idx: number): void {
+        this.mapEditContext.materialIdx = idx;
+        this.floor.cursorBlock.material = new THREE.MeshPhongMaterial({map: this.textures[idx].texture});
     }
 
     public set editMode(mode: string) {
