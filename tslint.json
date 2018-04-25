@@ -15,7 +15,8 @@
     "interface-name": false,
     "arrow-return-shorthand": false,
     "max-classes-per-file": false,
-    "only-arrow-functions": false
+    "only-arrow-functions": false,
+    "ordered-imports": false
   },
   "jsRules": {
     "max-line-length": {

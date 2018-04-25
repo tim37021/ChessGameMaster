@@ -15,6 +15,10 @@ g.state:hover circle{
     fill: rgb(200, 238, 241);
 }
 
+g.selected circle {
+    fill: rgb(250, 232, 255);
+}
+
 path.transition {
     fill: none;
     stroke: #333;
@@ -24,4 +28,19 @@ path.transition {
 
 path.transition:hover{
     stroke: rgb(94, 196, 204);
+}
+
+path.selected {
+    stroke: rgb(250, 232, 255);
+}
+
+path.link.hidden{
+    stroke-width: 0;
+}
+
+path.dragline {
+    fill: none;
+    stroke: #333;
+    stroke-width: 6px;
+    cursor: default;
 }
