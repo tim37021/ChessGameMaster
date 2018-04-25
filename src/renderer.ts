@@ -6,26 +6,40 @@ import { ChessEditor } from "./ChessEditor";
 import { ImagePicker } from "./ImagePicker";
 import { ModelPreviewer } from "./ModelPreviewer";
 import { PieceState } from "./PieceState";
+import { ProgrammableTransition } from "./ProgrammableTransition";
+import { StateDiagram } from "./StateDiagram";
+
 
 const dialog = remote.dialog;
 
 let stopbtn: HTMLElement;
 let board: ChessEditor;
-let sd: ModelPreviewer;
+let mp: ModelPreviewer;
 let ip: ImagePicker;
+let sd: StateDiagram;
 
 function init() {
     const container = document.getElementById("container");
     const stateconatiner = document.getElementById("state-container");
     const ipcontainer = document.getElementById("ip-container");
+    const sdcontainer = document.getElementById("sd-container");
     board = new ChessEditor(container, {dims: [8, 8]});
-    sd = new ModelPreviewer({width: 256, height: 256});
+    mp = new ModelPreviewer({width: 256, height: 256});
     ip = new ImagePicker();
+    sd = new StateDiagram({width: "100%", height: "100%"});
+
+    sd.data = [new PieceState("GG", null), new PieceState("GG2", null)];
+    sd.data[0].transitionRules.push(new ProgrammableTransition(sd.data[1], null, null));
+
     ip.on("changed", (idx: number) => {
         board.setEditMaterial(idx);
     });
-    stateconatiner.appendChild(sd.domElement);
+    stateconatiner.appendChild(mp.domElement);
     ipcontainer.appendChild(ip.domElement);
+    sdcontainer.appendChild(sd.domElement);
+
+    sd.update();
+
     stopbtn = document.getElementById("stopbtn");
 }
 

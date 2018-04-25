@@ -8,8 +8,8 @@ export class PieceState extends State {
     public mesh: THREE.Mesh;
     public movements: Movement[] = Array();
 
-    constructor(mesh: THREE.Mesh) {
-        super();
+    constructor(name: string, mesh: THREE.Mesh) {
+        super(name);
         this.mesh = mesh;
     }
 }

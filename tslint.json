@@ -14,7 +14,8 @@
     "no-console": false,
     "interface-name": false,
     "arrow-return-shorthand": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "only-arrow-functions": false
   },
   "jsRules": {
     "max-line-length": {

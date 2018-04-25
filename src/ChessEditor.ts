@@ -61,9 +61,10 @@ export class ChessEditor {
     }
 
     public registerTexture(texname: string, filename: string): void {
+        const tex: ITextureInfo = { name: texname, filepath: filename, texture: null };
+        this.textures.push(tex);
         new THREE.TextureLoader().load(filename, (text: THREE.Texture) => {
-            console.log(filename);
-            this.textures.push({name: texname, filepath: filename, texture: text});
+            this.textures[this.textures.indexOf(tex)].texture = text;
         });
     }
 
