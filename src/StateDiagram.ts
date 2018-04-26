@@ -127,9 +127,11 @@ export class StateDiagram {
                 }
             });
             if (mind < 2500) {
-                this.dragState.transitionRules.push(
-                    new ProgrammableTransition(minState, () => { return true; }, () => { return; }));
-                this.update();
+                if (this.dragState.transitionRules.filter((d: Transition) => d.dstState === minState).length === 0) {
+                    this.dragState.transitionRules.push(
+                        new ProgrammableTransition(minState, () => { return true; }, () => { return; }));
+                    this.update();
+                }
             }
             this.dragState = null;
             this.dragLine.attr("visibility", "hidden");
@@ -153,13 +155,19 @@ export class StateDiagram {
 
         const transitions = this.entryTG.selectAll(".transition").data(this.cachedLinks);
 
-        transitions.enter()
+        transitions.attr("d", (l: any) => {
+            return `M${l.srcState.x},${l.srcState.y}L${l.dstState.x},${l.dstState.y}`;
+        });
+
+        transitions
+        .enter()
         .append("path")
         .classed("transition", true)
+        .style("marker-end", "url('#end-arrow')")
+        .on("click", this.onClicked.bind(this))
         .attr("d", (l: any) => {
             return `M${l.srcState.x},${l.srcState.y}L${l.dstState.x},${l.dstState.y}`;
-        }).style("marker-end", "url('#end-arrow')")
-        .on("click", this.onClicked.bind(this));
+        });
 
         transitions.exit().remove();
 
@@ -171,6 +179,7 @@ export class StateDiagram {
 
         const enterstate = newGs.enter()
         .append("g")
+        .attr("transform", (d: any) => `translate(${d.x}, ${d.y})`)
         .classed("state", true)
         .on("click", this.onClicked.bind(this))
         .call(this.onDrag);
@@ -189,6 +198,9 @@ export class StateDiagram {
         });*/
 
         enterstate.append("circle")
+        .attr("r", "1")
+        .transition()
+        .duration(300)
         .attr("r", 50);
 
         enterstate.append("text")
@@ -219,12 +231,15 @@ export class StateDiagram {
 
     private onKeydown(): void {
         if ((d3.event as KeyboardEvent).keyCode === 46) {
+            if (this.selected.object == null) {
+                return;
+            }
             if (this.selected.object instanceof State) {
                 const idx = this.data.indexOf(this.selected.object);
                 if (idx !== -1) {
                     this.data.splice(idx, 1);
                 }
-                // clear related state.
+
                 this.data.forEach((state: State) => {
                     state.transitionRules = state.transitionRules.filter((t: Transition) => {
                         return this.selected.object !== t.dstState;
@@ -245,7 +260,17 @@ export class StateDiagram {
         }
 
         if ((d3.event as KeyboardEvent).keyCode === 45) {
-            this.data.push(new PieceState("UNTITLED", null));
+            // clear related state.
+            const newstate = new PieceState("UNTITLED", null);
+            (newstate as any).x = 0;
+            (newstate as any).y = 0;
+            this.data.forEach((state: State) => {
+                (newstate as any).x += (state as any).x;
+                (newstate as any).y += (state as any).y;
+            });
+            (newstate as any).x /= this.data.length;
+            (newstate as any).y /= this.data.length;
+            this.data.push(newstate);
             this.update();
         }
     }
