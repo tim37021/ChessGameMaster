@@ -70,7 +70,6 @@ export class ModelPreviewer extends ISelection {
 
         d3.select(this.renderer.domElement).on( "mousedown", this.redraw.bind(this))
         .on("mousemove", this.redraw.bind(this))
-        .on("mousemove", this.redraw.bind(this))
         .on("wheel", this.redraw.bind(this));
         this.redraw();
     }
