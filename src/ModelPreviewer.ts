@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 import * as THREE from "three";
 import { OrbitControls } from "three-orbitcontrols-ts";
 import { ISelection } from "./ISelection";
@@ -67,8 +68,10 @@ export class ModelPreviewer extends ISelection {
         this.controls.enablePan = false;
         this.controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 
-        this.renderer.domElement.addEventListener( "mousedown", this.redraw.bind(this), false );
-        this.renderer.domElement.addEventListener( "mousemove", this.redraw.bind(this), false );
+        d3.select(this.renderer.domElement).on( "mousedown", this.redraw.bind(this))
+        .on("mousemove", this.redraw.bind(this))
+        .on("mousemove", this.redraw.bind(this))
+        .on("wheel", this.redraw.bind(this));
         this.redraw();
     }
 
