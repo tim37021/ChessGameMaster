@@ -10,10 +10,13 @@
 
   <body>
     <div class="w3-button w3-black" id="openbtn">匯入貼圖</div>
+    <div class="w3-button w3-black" id="openmeshbtn">匯入模型</div>
     <div class="w3-button w3-black" id="undobtn">UNDO</div>
     <div class="w3-button w3-black" id="newstatebtn">新狀態</div>
-    <div class="w3-button w3-black modebtn" id="editboardbtn">編輯棋盤</div>    
-    <div class="w3-button w3-black" id="stopbtn" style="display: none;">終了</div>
+    <div class="w3-button w3-black modebtn" id="editboardbtn" data-mode="editboard">編輯棋盤</div>
+    <div class="w3-button w3-black stopbtn" style="display: none;">終了</div>
+    <div class="w3-button w3-black modebtn" id="editboardbtn" data-mode="placepiece">放置棋子</div>
+    <div class="w3-button w3-black stopbtn" style="display: none;">終了</div>
     <div id="container" style="width: 800px; height: 600px;"></div>
     <div id="state-container" class="state-container draggable" style="width: 512px; height: 512px; background: white;"></div>
     <div id="ip-container" class="ip-container draggable" style="width: 512px; height: 128px; background: white;"></div>

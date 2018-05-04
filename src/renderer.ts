@@ -3,7 +3,7 @@ import * as fs from "fs";
 
 import { ChessEditor } from "./ChessEditor";
 
-import { ImagePicker } from "./ImagePicker";
+import { Picker } from "./Picker";
 import { ModelPreviewer } from "./ModelPreviewer";
 import { PieceState } from "./PieceState";
 import { ProgrammableTransition } from "./ProgrammableTransition";
@@ -12,10 +12,9 @@ import { StateDiagram } from "./StateDiagram";
 
 const dialog = remote.dialog;
 
-let stopbtn: HTMLElement;
 let board: ChessEditor;
-let mp: ModelPreviewer;
-let ip: ImagePicker;
+let mp: Picker;
+let ip: Picker;
 let sd: StateDiagram;
 
 function init() {
@@ -23,13 +22,18 @@ function init() {
     const stateconatiner = document.getElementById("state-container");
     const ipcontainer = document.getElementById("ip-container");
     const sdcontainer = document.getElementById("sd-container");
-    board = new ChessEditor(container, {dims: [8, 8]});
-    mp = new ModelPreviewer({width: 256, height: 256});
-    ip = new ImagePicker();
+    board = new ChessEditor({dims: [8, 8], width: 512, height: 512});
+    /*mp = new Picker({width: "256px", height: "256px"});
+    ip = new Picker({width: "128px", height: "128px"});*/
     sd = new StateDiagram({width: "100%", height: "100%"});
 
-    sd.data = [new PieceState("GG", null), new PieceState("GG2", null)];
-    sd.data[0].transitionRules.push(new ProgrammableTransition(sd.data[1], null, null));
+    board.on("mapcursormaterial", (idx: number) => {
+        ip.selectionIndex = idx;
+    });
+
+    sd.on("selected", (d: any) => {
+        console.log(d);
+    });
 
     ip.on("changed", (idx: number) => {
         board.setEditMaterial(idx);
@@ -40,7 +44,18 @@ function init() {
 
     sd.update();
 
-    stopbtn = document.getElementById("stopbtn");
+    ipcontainer.addEventListener("click", board.focus.bind(board));
+
+    [].forEach.call(document.getElementsByClassName("stopbtn"), (stopbtn: HTMLElement) => {
+        stopbtn.addEventListener("click", () => {
+            board.editMode = "normal";
+            stopbtn.style.display = "none";
+            [].forEach.call(document.getElementsByClassName("modebtn"), (elmnt: HTMLElement) => {
+                elmnt.style.display = null;
+            });
+        });
+
+    });
 }
 
 function animate() {
@@ -59,21 +74,30 @@ function load_textures() {
         filenames.forEach((filename) => {
             console.log(filename);
             board.registerTexture("UNTITLED", filename);
-            ip.addImage("UNTITLED", filename);
+            ip.selections.push(new ImageSelection({name: "UNTITLED", filePath: filename}));
         });
     }
     board.focus();
     ip.update();
 }
-
+import * as THREE from "three";
+import { ImageSelection } from "./ImageSelection";
+// 以any方式引入 防止typescript哀號
+const {OBJLoader}: any = require("../src/OBJLoader.js");
+// 怒把THREE裡的prototype 換成真的實作
+(THREE as any).OBJLoader = OBJLoader;
 function load_mesh() {
     const filenames = dialog.showOpenDialog({properties: ["openFile", "multiSelections"]});
     if (filenames !== undefined) {
         filenames.forEach((filename) => {
-            board.registerTexture("UNTITLED", filename);
+            const nmp = new ModelPreviewer({name: "UNTITLED", width: 256, height: 256});
+            mp.selections.push(nmp);
+            board.registerGeometry("UNTITLED", filename, (mesh: THREE.Mesh) => {
+                nmp.mesh = mesh;
+            });
         });
     }
-    ip.update();
+    mp.update();
 
 }
 
@@ -82,6 +106,7 @@ window.onload = () => {
     animate();
 
     document.getElementById("openbtn").addEventListener("click", load_textures);
+    document.getElementById("openmeshbtn").addEventListener("click", load_mesh);
     document.getElementById("undobtn").addEventListener("click", (e: MouseEvent) => {
         board.undo();
     });
@@ -90,16 +115,14 @@ window.onload = () => {
         //
     });
 
-    document.getElementById("editboardbtn").addEventListener("click", (e: MouseEvent) => {
-        board.editMode = "editboard";
-        (e.target as HTMLElement).style.display = "none";
-        stopbtn.style.display = null;
-    });
-    stopbtn.addEventListener("click", () => {
-        board.editMode = "normal";
-        stopbtn.style.display = "none";
-        [].forEach.call(document.getElementsByClassName("modebtn"), (element: HTMLElement) => {
-            element.style.display = null;
+    [].forEach.call(document.getElementsByClassName("modebtn"), (elmnt: HTMLElement) => {
+        elmnt.addEventListener("click", (e: MouseEvent) => {
+            if (board.editMode !== "normal") {
+                return;
+            }
+            board.editMode = elmnt.dataset.mode;
+            (e.target as HTMLElement).style.display = "none";
+            ((e.target as HTMLElement).nextElementSibling as HTMLElement).style.display = null;
         });
     });
 };

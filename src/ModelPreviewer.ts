@@ -1,19 +1,24 @@
 import * as THREE from "three";
 import { OrbitControls } from "three-orbitcontrols-ts";
+import { ISelection } from "./ISelection";
 
 interface IModelPreviewerCreateInfo {
+    name: string;
     width: number;
     height: number;
 }
 
-export class ModelPreviewer {
+export class ModelPreviewer extends ISelection {
     private renderer: THREE.WebGLRenderer;
     private scene: THREE.Scene;
     private camera: THREE.Camera;
     private controls: OrbitControls;
+    private nameP: string;
 
     constructor(params: IModelPreviewerCreateInfo) {
+        super();
         this.init(params);
+        this.nameP = params.name;
     }
 
     public set mesh(mesh: THREE.Mesh) {
@@ -30,6 +35,10 @@ export class ModelPreviewer {
         } else {
             return null;
         }
+    }
+
+    public get name(): string {
+        return this.nameP;
     }
 
     public get domElement(): HTMLCanvasElement {
@@ -52,7 +61,7 @@ export class ModelPreviewer {
         this.scene.add(new THREE.AxesHelper(100));
 
         this.camera = new THREE.PerspectiveCamera( 45, 1, 1, 3500 );
-        this.camera.position.z = 250;
+        this.camera.position.z = 25;
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
         this.controls.enablePan = false;

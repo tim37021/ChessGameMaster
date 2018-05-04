@@ -19,8 +19,13 @@ interface IPosition {
     y: number;
 }
 
+interface IStateDiagramEvent {
+    onStateSelectd: (state: State) => void;
+    onTransitionSelectd: (state: Transition) => void;
+}
+
 export class StateDiagram {
-    public data: State[];
+    public data: State[] = new Array();
     private domElementP: SVGElement;
     private onDrag: any;
     private onClicked: any;
@@ -32,9 +37,10 @@ export class StateDiagram {
     private selected: SelectedState = null;
     private dragState: State = null;
     private d: IPosition = {x: 0, y: 0};
+    private events: IStateDiagramEvent = {onStateSelectd: null, onTransitionSelectd: null};
 
     constructor(params: StateDiagramCreateInfo) {
-        this.domElementP = d3.create("svg").attr("id", "state-diagram").style("width", params.width)
+        this.domElementP = d3.create("svg").classed("state-diagram", true).style("width", params.width)
             .style("height", params.height).attr("focusable", "false").node() as SVGElement;
 
         const defs = d3.select(this.domElementP).append("svg:defs");
@@ -65,7 +71,7 @@ export class StateDiagram {
         d3.select(this.domElementP).append("rect")
         .attr("width", params.width)
         .attr("height", params.height)
-        .style("fill", "none")
+        .style("fill", "gray")
         .style("pointer-events", "all")
         .call(d3.zoom()
             .scaleExtent([1 / 2, 4])
@@ -88,7 +94,6 @@ export class StateDiagram {
 
         this.onDrag = d3.drag()
         .on("start", (elmnt: any, key: number, data: Element[]) => {
-            d3.select(data[key]).raise();
             this.d = {x: elmnt.x, y: elmnt.y};
         })
         .on("drag", (elmnt: any, key: number, data: Element[]) => {
@@ -140,9 +145,23 @@ export class StateDiagram {
         this.onClicked = (elmnt: IPosition, key: number, nodes: Element[]) => {
             if (this.selected !== null) {
                 d3.select(this.selected.node).classed("selected", false);
+                if (this.selected.object !== elmnt) {
+                    if (this.selected.object instanceof State) {
+                        if (this.events.onStateSelectd !== null) {
+                            this.events.onStateSelectd(this.selected.object);
+                        }
+                    }
+                    if (this.selected.object instanceof Transition) {
+                        if (this.events.onTransitionSelectd !== null) {
+                            this.events.onTransitionSelectd(this.selected.object);
+                        }
+                    }
+                }
             }
             this.selected = {object: elmnt, node: nodes[key]};
             d3.select(this.selected.node).classed("selected", true);
+
+            d3.select(this.selected.node).raise();
         };
     }
 
@@ -211,7 +230,14 @@ export class StateDiagram {
     }
 
     public on(ename: string, cbk: (e: any) => void): void {
-        //
+        if (ename === "selectstate") {
+            this.events.onStateSelectd = cbk;
+        } else if (ename === "selecttransition") {
+            this.events.onTransitionSelectd = cbk;
+        } else if (ename === "select") {
+            this.events.onStateSelectd = cbk;
+            this.events.onTransitionSelectd = cbk;
+        }
     }
 
     private updateCache(): void {
@@ -264,12 +290,14 @@ export class StateDiagram {
             const newstate = new PieceState("UNTITLED", null);
             (newstate as any).x = 0;
             (newstate as any).y = 0;
-            this.data.forEach((state: State) => {
-                (newstate as any).x += (state as any).x;
-                (newstate as any).y += (state as any).y;
-            });
-            (newstate as any).x /= this.data.length;
-            (newstate as any).y /= this.data.length;
+            if (this.data.length > 0) {
+                this.data.forEach((state: State) => {
+                    (newstate as any).x += (state as any).x;
+                    (newstate as any).y += (state as any).y;
+                });
+                (newstate as any).x /= this.data.length;
+                (newstate as any).y /= this.data.length;
+            }
             this.data.push(newstate);
             this.update();
         }

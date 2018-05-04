@@ -1,0 +1,208 @@
+<html>
+    <head>
+        <title>ChessGameMaster</title>
+        <style>
+        body {
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            overflow: hidden;
+            font-family: 'Open Sans', sans-serif;
+            cursor:default;
+            display: grid;
+            grid-template-rows: 50px 18px auto 25px;
+            grid-template-areas: 
+                "h"
+                "t"
+                "w"
+                "f";
+        }
+        .header {
+            grid-area: h;
+            background: black;
+            border-bottom: 1px solid #000;
+            /*padding-top: 7.5px;
+            padding-bottom: 7.5px;*/
+            padding-left: 0px;
+            display: grid;
+            grid-template-columns: 128px auto 75px 75px 75px;
+        }
+        .menubar {
+            display: block;
+            margin-left:auto;
+            margin-right: 10px;
+            margin-top: 7.5px;
+            
+        }
+        .menuroot {
+            text-align: center;
+        }
+        .menuroot .text {
+            color: white;
+            transform: translate(0, 20px);
+        }
+
+        .menuroot .text:hover {
+            color: rgb(247, 202, 2);
+        }
+        
+        .menuroot .submenu {
+            background: white;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            width: 128px;
+            transform: translate(0, 25px);
+            border: 1px solid black;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .menuroot .menu {
+            width: 100%;
+            display: inline-block;
+        }
+
+        .menuroot .menu {
+            background: white;
+        }
+        .menuroot .menu:hover {
+            background: rgb(247, 202, 2);
+        }
+
+        .tabstrip {
+            background: #282828;
+            height: 18px;
+            padding-left: 10px;
+        }
+        .tab {
+            grid-area: t;
+            background: #999999;
+            width: 10%;
+            max-width: 128px;
+            min-width: 50px;
+            height: 100%;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            padding-left: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        .tabstrip .selected{
+            background: #666666;
+        }
+
+        .workspace {
+            grid-area: w;
+            background: #666666;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 40% 60%; 
+            grid-gap: 10px;
+        }
+
+        .workspace-right-column {
+            display: grid;
+            grid-template-columns: 10% 1fr 1fr 10%;
+            grid-template-rows: 10% 1fr 1fr 10%;
+            grid-template-areas:
+                ". . . ."
+                ". a a ."
+                ". a a ."
+                ". . . ."
+        }
+
+        .workspace-right-column canvas {
+            grid-area: a;
+            align-self: center;
+            justify-self: center;
+            outline: none;
+        }
+
+        .workspace-left-column {
+            display: grid;
+            grid-template-columns: 10px auto;
+            grid-template-areas: ". a";
+        }
+
+        .workspace-left-column .sidebar {
+            grid-area: a;
+            background: #333333;
+            display: grid;
+            grid-template-rows: 1fr 64px 400px;
+            grid-template-areas: 
+                "."
+                "i"
+                "s";
+        }
+
+        .workspace-left-column .picker-container {
+            grid-area: i;
+            overflow: hidden;
+            white-space:nowrap;
+        }
+
+        .workspace-left-column .picker .selection {
+            font: 10px sans-serif;
+            border: gray 1px solid;
+            text-align: right;
+            padding: 3px;
+            margin: 10px;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .workspace-left-column .picker .selected {
+            border: 2px blue solid;
+        }
+
+        .workspace-left-column .picker div img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .workspace-left-column .sd-container {
+            grid-area: s;
+            padding: 10px;
+        }
+
+        .workspace-left-column svg {
+            outline: none;
+        }
+
+        .footer {
+            grid-area: f;
+            background: black;
+        }
+        </style>
+        <link rel="stylesheet" href="./styles/state-diagram.css">
+    </head>
+    <body>
+        <div class="header">
+            <img src="./images/Logo.png" style="-webkit-app-region: drag;" />
+            <div></div>
+            <div class="menuroot"><div class="text">File</div>
+                <div class="submenu">
+                <div class="menu newbtn">New</div>
+                <div class="menu openbtn">Open</div>
+                <div class="menu importimgbtn">Import images</div>
+                <div class="menu importmeshbtn">Import Meshes</div>
+                </div>
+            </div>
+            <div class="menuroot"><div class="text">Edit</div>
+                <div class="submenu">
+                    <div class="menu normalmodebtn">Normal Mode</div>
+                    <div class="menu editboardbtn">Edit Board</div>
+                </div>
+            </div>
+            <div class="menuroot"><div class="text">Help</div></div>
+        </div>
+        <div id="tabstripcontainer"></div>
+        <div class="footer"></div>
+        <script>
+        require('./dist/renderer2.js');
+        </script>
+    </body>
+</html>

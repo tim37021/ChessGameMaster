@@ -7,13 +7,14 @@ let mainWindow: Electron.BrowserWindow;
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800,
+    frame: false,
+    height: 720,
+    width: 1280,
   });
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
-      pathname: path.join(__dirname, "../index.html"),
+      pathname: path.join(__dirname, "../index2.html"),
       protocol: "file:",
       slashes: true,
   }));

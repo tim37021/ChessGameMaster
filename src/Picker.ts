@@ -1,10 +1,5 @@
 import * as d3 from "d3";
-
-interface Image {
-    name: string;
-    filepath: string;
-}
-
+import { ISelection } from "./ISelection";
 interface AnimatorInfo {
     initSpeed: number;
     maxSpeed: number;
@@ -49,22 +44,31 @@ class Animator {
     }
 }
 
-export class ImagePicker {
+interface PickerCreateInfo {
+    imgWidth: number;
+    imgHeight: number;
+}
+
+export class Picker {
+    private imgWidth: number;
+    private imgHeight: number;
     private domElementP: HTMLElement;
-    private images: Image[] = new Array();
-    private selectionP: number = 0;
+    private selectionsP: ISelection[] = new Array();
+    private selectionIdxP: number = -1;
     private dx: number = 0;
     private animator: Animator = new Animator();
     private changedEvent: (idx: number) => void;
 
-    constructor() {
-        const node = d3.create("div").classed("image-picker", true).style("-webkit-box-align", "center")
+    constructor(params: PickerCreateInfo) {
+        const node = d3.create("div").classed("picker", true).style("-webkit-box-align", "center")
             .style("-webkit-box-pack", "center").style("display", "-webkit-box");
         /*node.append("div").classed("navigate-left", true).style("position", "absolute")
             .on("mouseover", this.onScrollLeft.bind(this)).on("mouseout", this.animator.stop.bind(this.animator));
         node.append("div").classed("navigate-right", true).style("position", "absolute")
             .on("mouseover", this.onScrollRight.bind(this)).on("mouseout", this.animator.stop.bind(this.animator));*/
         this.domElementP = node.node() as HTMLElement;
+        this.imgWidth = params.imgWidth;
+        this.imgHeight = params.imgHeight;
     }
 
     public get domElement(): HTMLElement {
@@ -72,33 +76,34 @@ export class ImagePicker {
     }
 
     public get selectionIndex(): number {
-        return this.selectionP;
+        return this.selectionIdxP;
     }
 
     public set selectionIndex(idx: number) {
-        this.selectionP = idx;
+        this.selectionIdxP = idx;
         this.updateSelection();
     }
 
-    public addImage(imname: string, filename: string): void {
-        this.images.push({name: imname, filepath: filename});
+    /*
+    public add(imname: string, filename: string): void {
+        this.selections.push({name: imname, filepath: filename});
     }
+*/
 
     public update(): void {
 
-        d3.select(this.domElement).selectAll(".images")
-            .data(this.images)
-            .classed("selected", (d: Image, key: number) => {
-                return ((key === this.selectionP));
+        d3.select(this.domElement).selectAll(".selection")
+            .data(this.selectionsP)
+            .classed("selected", (d: ISelection, key: number) => {
+                return ((key === this.selectionIdxP));
             })
             .enter().append("div")
-            .classed("images", true)
+            .classed("selection", true)
             .style("display", "inline-block")
             .style("left", "50%")
-            .style("width", "128px")
-            .style("height", "128px")
-            .append("img")
-            .attr("src", (d: Image) => { return d.filepath; } )
+            .style("width", this.imgWidth)
+            .style("height", this.imgHeight)
+            .append((d: ISelection) => { return d.domElement; })
             .on("click", this.onClick.bind(this));
         this.updateTransform();
     }
@@ -110,34 +115,41 @@ export class ImagePicker {
     }
 
     private updateTransform(): void {
-        d3.select(this.domElement).selectAll(".images").transition()
-            .style("transform", (img: Image, key: number) => {
-                return `translate(${this.dx}px, 0px) scale(${this.selectionP === key ? "1.1" : "0.8"})`;
+        d3.select(this.domElement).selectAll(".selection").transition()
+            .style("transform", (img: Selection, key: number) => {
+                return `translate(${this.dx}px, 0px) scale(${this.selectionIdxP === key ? "1.0" : "0.8"})`;
             });
     }
 
     private updateSelection(): void {
-        d3.select(this.domElement).selectAll(".images").classed("selected", (d: Image, key: number) => {
-            return ((key === this.selectionP));
+        d3.select(this.domElement).selectAll(".selection").classed("selected", (d: ISelection, key: number) => {
+            return ((key === this.selectionIdxP));
         });
         const w = d3.select(this.domElement).node().getBoundingClientRect().width;
-        if (this.images.length * 128 <= w) {
-            this.dx = -this.selectionP * 128 + this.images.length * 128 / 2 - 64;
+        if (this.selectionsP.length * this.imgWidth <= w) {
+            this.dx = -this.selectionIdxP * this.imgWidth +
+                this.selectionsP.length * this.imgWidth / 2 - this.imgWidth / 2;
         } else {
-            this.dx = -this.selectionP * 128 + w / 2 - 64;
+            this.dx = -this.selectionIdxP * this.imgWidth + w / 2 - this.imgWidth / 2;
         }
         this.updateTransform();
     }
 
 
-    public get selection(): Image {
-        return this.images[this.selectionP];
+    public get selection(): ISelection {
+        return this.selectionsP[this.selectionIdxP];
     }
 
-    private onClick(e: Image, idx: number): void {
-        if (this.selectionP !== idx) {
+    public get selections(): ISelection[] {
+        return this.selectionsP;
+    }
+
+    private onClick(e: ISelection, idx: number): void {
+        if (this.selectionIdxP !== idx) {
             this.selectionIndex = idx;
-            this.changedEvent(this.selectionIndex);
+            if (this.changedEvent != null) {
+                this.changedEvent(this.selectionIndex);
+            }
         } else {
             this.selectionIndex = idx;
         }
