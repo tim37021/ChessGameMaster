@@ -6,32 +6,37 @@ path.transition {
 }
 
 g.state circle{
-    fill: #F6FBFF;
-    stroke: #333;
+    fill: #999999;
+    stroke: black;
+    stroke-width: 1px;
+}
+/*
+g.state:hover circle{
+    fill: rgb(200, 238, 241);
+}*/
+
+g.selected circle {
+    stroke: rgb(227, 177, 26);
     stroke-width: 2px;
 }
 
-g.state:hover circle{
-    fill: rgb(200, 238, 241);
-}
-
-g.selected circle {
-    fill: rgb(250, 232, 255);
+g.selected text {
+    fill: white;
 }
 
 path.transition {
     fill: none;
-    stroke: #333;
+    stroke: #999999;
     stroke-width: 6px;
     cursor: default;
 }
-
+/*
 path.transition:hover{
     stroke: rgb(94, 196, 204);
 }
-
+*/
 path.selected {
-    stroke: rgb(250, 232, 255);
+    stroke: rgb(227, 177, 26);
 }
 
 path.link.hidden{

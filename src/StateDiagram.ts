@@ -181,6 +181,9 @@ export class StateDiagram {
 
         transitions.attr("d", (l: any) => {
             return `M${l.srcState.x},${l.srcState.y}L${l.dstState.x},${l.dstState.y}`;
+        })
+        .each((data: Transition, i: number, nodes: Element[]) => {
+            (data as any).domElement = nodes[i];
         });
 
         transitions
@@ -200,6 +203,9 @@ export class StateDiagram {
 
         const newGs = this.entrySG.selectAll(".state").data(this.statesP);
         newGs
+        .each((data: State, i: number, nodes: Element[]) => {
+            (data as any).domElement = nodes[i];
+        })
         .attr("transform", (d: any) => `translate(${d.x}, ${d.y})`)
         .select("text")
         .text((d: State) => { return d.name; });
@@ -337,29 +343,29 @@ export class StateDiagram {
 
     private onKeydown(): void {
         if ((d3.event as KeyboardEvent).keyCode === 46) {
-            if (this.selectedP.object == null) {
+            if (this.selectedP == null) {
                 return;
             }
-            if (this.selectedP.object instanceof State) {
-                const idx = this.statesP.indexOf(this.selectedP.object);
+            if (this.selectedP instanceof State) {
+                const idx = this.statesP.indexOf(this.selectedP);
                 if (idx !== -1) {
                     this.statesP.splice(idx, 1);
                 }
 
                 this.statesP.forEach((state: State) => {
                     state.transitionRules = state.transitionRules.filter((t: Transition) => {
-                        return this.selectedP.object !== t.dstState;
+                        return this.selectedP !== t.dstState;
                     });
                 });
                 this.selectedP = null;
                 this.update();
-            } else if (this.selectedP.object instanceof Transition) {
-                const tarState = ((this.selectedP.object as any).srcState as State);
-                const index = tarState.transitionRules.indexOf(this.selectedP.object);
+            } else if (this.selectedP instanceof Transition) {
+                const tarState = ((this.selectedP as any).srcState as State);
+                const index = tarState.transitionRules.indexOf(this.selectedP);
                 if (index > -1) {
                     tarState.transitionRules.splice(index, 1);
                 }
-                this.selectedP.node.remove();
+                d3.select((this.selectedP as any).domElement).remove();
                 this.selectedP = null;
                 this.updateCache();
             }
