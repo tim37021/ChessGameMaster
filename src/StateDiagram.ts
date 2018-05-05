@@ -18,6 +18,8 @@ interface IStateDiagramEvent {
     onStateSelected: (state: State) => void;
     onTransitionSelected: (state: Transition) => void;
     onNewState: () => State;
+    onEditState: (state: State) => void;
+    onEditTransition: (t: Transition) => void;
 }
 
 export class StateDiagram {
@@ -34,7 +36,13 @@ export class StateDiagram {
     private selectedP: any = null;
     private dragState: State = null;
     private d: IPosition = {x: 0, y: 0};
-    private events: IStateDiagramEvent = {onStateSelected: null, onTransitionSelected: null, onNewState: null};
+    private events: IStateDiagramEvent = {
+        onEditState: null,
+        onEditTransition: null,
+        onNewState: null,
+        onStateSelected: null,
+        onTransitionSelected: null,
+    };
     private zoom: d3.ZoomBehavior<Element, {}>;
 
     constructor(params: StateDiagramCreateInfo) {
@@ -72,7 +80,7 @@ export class StateDiagram {
         this.zoomer = d3.select(this.domElementP).append("rect")
         .attr("width", params.width)
         .attr("height", params.height)
-        .style("fill", "gray")
+        .style("fill", "#474747")
         .style("pointer-events", "all")
         .call(this.zoom);
 
@@ -216,7 +224,9 @@ export class StateDiagram {
         .classed("state", true)
         .on("click", this.onClicked.bind(this))
         .on("dblclick", (elmnt) => {
-            this.locateState(elmnt);
+            if (this.events.onEditState != null) {
+                this.events.onEditState(elmnt);
+            }
         })
         .call(this.onDrag)
         .each((data: State, i: number, nodes: Element[]) => {
@@ -259,6 +269,10 @@ export class StateDiagram {
             this.events.onTransitionSelected = cbk;
         } else if (ename === "new") {
             this.events.onNewState = cbk.bind(null);
+        } else if (ename === "editstate") {
+            this.events.onEditState = cbk;
+        } else if (ename === "edittransition") {
+            this.events.onEditTransition = cbk;
         }
     }
 

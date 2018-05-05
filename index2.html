@@ -168,11 +168,43 @@
 
         .workspace-left-column .sd-container {
             grid-area: s;
-            padding: 10px;
+            display: grid;
+            grid-template-rows: 32 auto;
+            grid-template-areas: 
+                "t"
+                "s";
+        }
+        .workspace-left-column .sd-container .title {
+            grid-area: t;
         }
 
-        .workspace-left-column svg {
+        .workspace-left-column .sd-container .title .title-text {
+            padding: 5px;
+            font-size: 20px;
+            color: white;
+        }
+
+
+        .workspace-left-column .sd-container .content {
+            grid-area: s;
+            /*width: calc(100% - 10px);
+            height: calc(100% - 10px);*/
+            border-top:1px solid #999999;
+            padding: 5px;
+        }
+
+        .workspace-left-column .sd-container .content-inner {
+            margin: 5px;
+            border: 1px solid black;
+            width: 100%;
+            height: 100%;
+        }
+
+        .workspace-left-column .sd-container svg {
             outline: none;
+            border:1px solid black;
+            border-bottom: 1px solid #999999;
+
         }
 
         .footer {

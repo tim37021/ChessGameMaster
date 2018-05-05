@@ -64,6 +64,7 @@ export class ChessEditor {
     private renderer: THREE.WebGLRenderer;
     private camera: THREE.PerspectiveCamera;
     private controls: OrbitControls;
+    private objloader: THREE.OBJLoader = new THREE.OBJLoader();
 
     // control
     private mouse: THREE.Vector2;
@@ -92,7 +93,7 @@ export class ChessEditor {
                             cbk: (mesh: THREE.Mesh) => void = () => { return; }): void {
         const geo: IMeshInfo = {name: mname, filepath: filename, mesh: null};
         this.meshes.push(geo);
-        new THREE.OBJLoader().load(filename, (object: THREE.Mesh) => {
+        this.objloader.load(filename, (object: THREE.Mesh) => {
             const child: THREE.Mesh = object.children[0] as THREE.Mesh;
             object.material = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
             child.geometry.computeBoundingBox();
@@ -187,8 +188,6 @@ export class ChessEditor {
     public on(ename: string, cbk: (e: any) => void): void {
         if (ename === "mapcursormaterial") {
             this.events.onMaterialSelectChanged = cbk;
-        } else if (ename === "cursorstate") {
-            this.events.onStateSelectChanged = cbk;
         } else if (ename === "previewstatechange") {
             this.events.onStateSelectChanged = cbk;
         } else if (ename === "pieceselectchange") {
@@ -358,7 +357,7 @@ export class ChessEditor {
             if (this.mode === "placepiece") {
                 const idx = this.editContext.stateIdx;
                 this.boardP.cursorMeshIdx = idx;
-                if (this.events.onStateSelectChanged != null) {
+                if (this.events.onStateSelectChanged != null && idx < this.boardP.states.length) {
                     this.events.onStateSelectChanged(idx);
                 }
                 this.editContext.stateIdx = (this.editContext.stateIdx + 1) % (this.boardP.states.length + 1);

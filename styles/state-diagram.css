@@ -18,6 +18,7 @@ g.state:hover circle{
 g.selected circle {
     stroke: rgb(227, 177, 26);
     stroke-width: 2px;
+    transform: scale(1.05);
 }
 
 g.selected text {

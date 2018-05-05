@@ -8,6 +8,8 @@ import { ImageSelection } from "./ImageSelection";
 import { ModelPreviewer } from "./ModelPreviewer";
 import { PieceState } from "./PieceState";
 import { Piece } from "./Piece";
+import { ISelection } from "./ISelection";
+import { State } from "./State";
 
 export class EditorTab extends Tab {
     private imgPicker: Picker;
@@ -45,7 +47,14 @@ export class EditorTab extends Tab {
 
         // create mesh picker
         this.stateEditor = new StateDiagram({width: "100%", height: "100%"});
-        sb.append("div").classed("sd-container", true).append(() => { return this.stateEditor.domElement; });
+        const sdcontainer = sb.append("div").classed("sd-container", true);
+        sdcontainer
+        .append("div").classed("title", true)
+        .append("span").classed("title-text", true)
+        .text("State Diagram");
+        sdcontainer
+        .append("div").classed("content", true)
+        .append(() => { return this.stateEditor.domElement; });
 
         this.rc = d3.select(this.workspaceDomElementP).append("div")
             .classed("workspace-right-column", true).node() as HTMLElement;
@@ -116,20 +125,46 @@ export class EditorTab extends Tab {
             this.imgPicker.selectionIndex = idx;
         });
         this.chessEditorP.on("previewstatechange", (idx: number) => {
-            this.stateEditor.locateState(this.chessEditorP.board.states[idx]);
+            const state = this.chessEditorP.board.states[idx];
+            this.stateEditor.selectedState = state;
+            this.stateEditor.locateState(state);
+            const mpidx = this.meshPicker.selections.findIndex((selection: ISelection) => {
+                return (selection as ModelPreviewer).mesh === state.mesh;
+            });
+            if (mpidx >= 0) {
+                this.meshPicker.selectionIndex = mpidx;
+            }
         });
         this.chessEditorP.on("pieceselectchange", (p: Piece) => {
             this.stateEditor.selectedState = p.state;
             this.stateEditor.locateState(p.state);
+            const mpidx = this.meshPicker.selections.findIndex((selection: ISelection) => {
+                return (selection as ModelPreviewer).mesh === p.state.mesh;
+            });
+            if (mpidx >= 0) {
+                this.meshPicker.selectionIndex = mpidx;
+            }
         });
         this.imgPicker.on("changed", (idx: number) => {
             this.chessEditorP.setPreviewMaterial(idx);
         });
         this.meshPicker.on("changed", (idx: number) => {
-            this.chessEditor.setPreviewState(idx);
+            // make sure the selected item is state
+            if (this.stateEditor.selected instanceof State) {
+                (this.stateEditor.selected as PieceState).mesh = (this.meshPicker.selection as ModelPreviewer).mesh;
+            }
         });
         this.stateEditor.on("new", () => {
             return new PieceState("UNTITLED", this.defaultMesh);
+        });
+        this.stateEditor.on("selectstate", (state: PieceState) => {
+            const mpidx = this.meshPicker.selections.findIndex((selection: ISelection) => {
+                return (selection as ModelPreviewer).mesh === state.mesh;
+            });
+            if (mpidx >= 0) {
+                this.meshPicker.selectionIndex = mpidx;
+            }
+            this.chessEditorP.setPreviewState(this.chessEditorP.board.states.indexOf(state));
         });
     }
 }
