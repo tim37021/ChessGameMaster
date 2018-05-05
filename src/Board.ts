@@ -8,6 +8,13 @@ interface IBoardCreateInfo {
     blockWidth: number;
 }
 
+interface IntersectInfo {
+    object: THREE.Mesh;
+    p: Piece;
+    x: number;
+    y: number;
+}
+
 export class Board {
     private sigma: WorldState;
     private sceneNode: THREE.Scene = new THREE.Scene();
@@ -17,6 +24,7 @@ export class Board {
     private cursorPosP: [number, number];
     private boxGeometry: THREE.Geometry;
     private stateIdx: number;
+    private scenePieces: THREE.Mesh[] = new Array();
 
     constructor(params: IBoardCreateInfo) {
         this.sigma = new WorldState({dims: params.dims});
@@ -27,6 +35,7 @@ export class Board {
             new THREE.MeshBasicMaterial({color: 0xFF0000, opacity: 0.5, transparent: true}));
         this.rollOverMesh.visible = false;
         this.stateIdx = -1;
+        this.prepareScene();
     }
 
     // caution: time consuming! call only when sigma changed
@@ -41,11 +50,16 @@ export class Board {
         const l = -this.sigma.dimension[1] / 2 * w;
 
         const pieces = this.sigma.pieces;
+        this.scenePieces = [];
         for (const p of pieces) {
             const mesh = p.state.mesh.clone();
             mesh.position.x = t + p.x * w + w / 2;
             mesh.position.y = l + p.y * w + w / 2;
+            mesh.material = (p.state.mesh.material as THREE.Material).clone();
+            // TODO: rotate by 90 elsewhere
+            mesh.rotateX(Math.PI / 2);
             this.scene.add(mesh);
+            this.scenePieces.push(mesh);
         }
     }
 
@@ -61,13 +75,30 @@ export class Board {
         this.prepareScene();
     }
 
+    public intersect(raycaster: THREE.Raycaster): IntersectInfo {
+        const objs = raycaster.intersectObjects(this.scenePieces);
+        const w = this.blockWidth;
+        const t = -this.sigma.dimension[0] / 2 * 20;
+        const l = -this.sigma.dimension[1] / 2 * 20;
+        if (objs.length > 0) {
+            const X = (objs[0].object.position.x - t - w / 2) / w;
+            const Y = (objs[0].object.position.y - l - w / 2) / w;
+            const P = this.worldState.getPiece(X, Y);
+            return {object: objs[0].object as THREE.Mesh, p: P, x: X, y: Y};
+        } else {
+            return null;
+        }
+    }
+
     public set cursorMeshIdx(idx: number) {
         if (idx < 0 || idx >= this.statesP.length) {
             this.rollOverMesh.geometry = this.boxGeometry;
             this.stateIdx = -1;
         } else {
             this.rollOverMesh.geometry = this.statesP[idx].mesh.geometry;
-            this.rollOverMesh.rotation.copy(this.states[idx].mesh.rotation);
+            // TODO: rotate elsewhere
+            this.rollOverMesh.rotation.x = Math.PI / 2;
+            // this.rollOverMesh.rotation.copy(this.states[idx].mesh.rotation);
             this.stateIdx = idx;
         }
     }

@@ -130,14 +130,21 @@
             grid-area: a;
             background: #333333;
             display: grid;
-            grid-template-rows: 1fr 64px 400px;
+            grid-template-rows: 1fr 128px 64px 400px;
             grid-template-areas: 
                 "."
+                "m"
                 "i"
                 "s";
         }
 
-        .workspace-left-column .picker-container {
+        .workspace-left-column .meshpicker-container {
+            grid-area: m;
+            overflow: hidden;
+            white-space:nowrap;
+        }
+
+        .workspace-left-column .imgpicker-container {
             grid-area: i;
             overflow: hidden;
             white-space:nowrap;
@@ -152,10 +159,6 @@
             color: white;
             margin: 0;
             padding: 0;
-        }
-
-        .workspace-left-column .picker .selected {
-            border: 2px blue solid;
         }
 
         .workspace-left-column .picker div img {
@@ -195,6 +198,7 @@
                 <div class="submenu">
                     <div class="menu normalmodebtn">Normal Mode</div>
                     <div class="menu editboardbtn">Edit Board</div>
+                    <div class="menu placepiecebtn">Place Pieces</div>
                 </div>
             </div>
             <div class="menuroot"><div class="text">Help</div></div>

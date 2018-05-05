@@ -23,6 +23,7 @@ interface IKeybinding {
 interface IEditContext {
     materialIdx: number;
     stateIdx: number;
+    selectedMesh: THREE.Mesh;
 }
 
 interface ITextureInfo {
@@ -40,6 +41,7 @@ interface IMeshInfo {
 interface IChessEditorEvent {
     onMaterialSelectChanged: (idx: number) => void;
     onStateSelectChanged: (idx: number) => void;
+    onPieceSelectChanged: (p: Piece) => void;
 }
 
 export class ChessEditor {
@@ -47,12 +49,16 @@ export class ChessEditor {
 
     private dims: [number, number];
     private floor: Floor;
-    private board: Board;
+    private boardP: Board;
     private textures: ITextureInfo[] = new Array();
     private meshes: IMeshInfo[] = new Array();
-    private editContext: IEditContext = {materialIdx: 0, stateIdx: 0};
+    private editContext: IEditContext = {materialIdx: 0, stateIdx: 0, selectedMesh: null};
     private mode: string;
-    private events: IChessEditorEvent = {onMaterialSelectChanged: null, onStateSelectChanged: null};
+    private events: IChessEditorEvent = {
+        onMaterialSelectChanged: null,
+        onPieceSelectChanged: null,
+        onStateSelectChanged: null,
+    };
 
     // threejs stuff
     private renderer: THREE.WebGLRenderer;
@@ -130,21 +136,26 @@ export class ChessEditor {
         this.renderer.domElement.focus();
     }
 
-    public setEditMaterial(idx: number): void {
+    public setPreviewMaterial(idx: number): void {
         this.editContext.materialIdx = idx;
         this.floor.cursorBlock.material = new THREE.MeshPhongMaterial({map: this.textures[idx].texture});
+    }
+
+    public setPreviewState(idx: number) {
+        this.editContext.stateIdx = idx;
+        this.boardP.cursorMeshIdx = idx;
     }
 
     public set editMode(mode: string) {
         if (mode === "editboard") {
             this.mode = "editboard";
-            this.board.scene.visible = false;
+            this.boardP.scene.visible = false;
         } else if (mode === "placepiece") {
             this.mode = "placepiece";
-            this.board.scene.visible = true;
+            this.boardP.scene.visible = true;
         } else {
             this.mode = "normal";
-            this.board.scene.visible = true;
+            this.boardP.scene.visible = true;
         }
         this.floor.cursorBlock.visible = false;
     }
@@ -155,6 +166,10 @@ export class ChessEditor {
 
     public get domElement(): HTMLCanvasElement {
         return this.renderer.domElement;
+    }
+
+    public get board(): Board {
+        return this.boardP;
     }
 
     public undo(): void {
@@ -172,9 +187,12 @@ export class ChessEditor {
     public on(ename: string, cbk: (e: any) => void): void {
         if (ename === "mapcursormaterial") {
             this.events.onMaterialSelectChanged = cbk;
-        }
-        if (ename === "cursorstate") {
+        } else if (ename === "cursorstate") {
             this.events.onStateSelectChanged = cbk;
+        } else if (ename === "previewstatechange") {
+            this.events.onStateSelectChanged = cbk;
+        } else if (ename === "pieceselectchange") {
+            this.events.onPieceSelectChanged = cbk;
         }
     }
 
@@ -201,9 +219,9 @@ export class ChessEditor {
         this.floor.scene.position.z = 20;
         this.scene.add(this.floor.scene);
 
-        this.board = new Board({dims: this.dims, blockWidth: 20});
-        this.board.scene.position.z = 30;
-        this.scene.add(this.board.scene);
+        this.boardP = new Board({dims: this.dims, blockWidth: 20});
+        this.boardP.scene.position.z = 30;
+        this.scene.add(this.boardP.scene);
         const geo = new THREE.BoxGeometry(20, 20, 20);
         const material = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
 
@@ -248,9 +266,8 @@ export class ChessEditor {
         this.renderer.domElement.focus();
         this.raycaster.setFromCamera( this.mouse, this.camera );
         if (this.mode === "editboard") {
-            const intersects = this.raycaster.intersectObjects( this.floor.blocks );
-            if (intersects.length > 0) {
-                const intersect = intersects[ 0 ];
+            const intersect = this.floor.intersect(this.raycaster);
+            if (intersect != null) {
                 if (this.floor.cursorBlock.material !== this.rollOverMaterial) {
                     this.floor.pushState();
                     (intersect.object as THREE.Mesh).material = this.floor.cursorBlock.material;
@@ -259,7 +276,16 @@ export class ChessEditor {
         }
 
         if (this.mode === "placepiece") {
-            this.board.put();
+            this.boardP.put();
+        }
+
+        if (this.mode === "normal") {
+            const intersect = this.boardP.intersect(this.raycaster);
+            if (intersect != null) {
+                if (this.events.onPieceSelectChanged != null) {
+                    this.events.onPieceSelectChanged(intersect.p);
+                }
+            }
         }
     }
 
@@ -272,31 +298,35 @@ export class ChessEditor {
             - ( (event.clientY  - offset[1]) / height ) * 2 + 1 );
         this.raycaster.setFromCamera( this.mouse, this.camera );
 
-        const t = -this.dims[0] / 2 * 20;
-        const l = -this.dims[1] / 2 * 20;
-        const w = 20;
-
         if (this.mode === "editboard") {
-            const intersects = this.raycaster.intersectObjects( this.floor.blocks );
-            if (intersects.length > 0) {
-                const obj = intersects[ 0 ].object;
-                this.floor.cursorBlock.position.copy(obj.position);
-                this.floor.cursorBlock.visible = true;
+            const intersect = this.floor.intersect(this.raycaster);
+            if (intersect != null) {
+                this.floor.cursorPos = [intersect.x, intersect.y];
+                this.floor.enableCursor = true;
             } else {
-                this.floor.cursorBlock.visible = false;
+                this.floor.enableCursor = false;
             }
         }
 
         if (this.mode === "placepiece") {
-            const intersects = this.raycaster.intersectObjects( this.floor.blocks );
-            if (intersects.length > 0) {
-                const obj = intersects[ 0 ].object;
-                const x = (obj.position.x - t - w / 2) / w;
-                const y = (obj.position.y - l - w / 2) / w;
-                this.board.cursorPos = [x, y];
-                this.board.enableCursor = true;
+            const intersect = this.floor.intersect(this.raycaster);
+            if (intersect != null) {
+                this.boardP.cursorPos = [intersect.x, intersect.y];
+                this.boardP.enableCursor = true;
             } else {
-                this.board.enableCursor = false;
+                this.boardP.enableCursor = false;
+            }
+        }
+
+        if (this.mode === "normal") {
+            const intersect = this.boardP.intersect(this.raycaster);
+            if (this.editContext.selectedMesh != null) {
+                (this.editContext.selectedMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0xFFFFFF);
+                this.editContext.selectedMesh = null;
+            }
+            if (intersect != null) {
+                (intersect.object.material as THREE.MeshPhongMaterial).color = new THREE.Color(0x00FF00);
+                this.editContext.selectedMesh = intersect.object;
             }
         }
     }
@@ -327,19 +357,11 @@ export class ChessEditor {
 
             if (this.mode === "placepiece") {
                 const idx = this.editContext.stateIdx;
-                if (idx < this.board.states.length) {
-                    this.board.cursorMeshIdx = idx;
-                    if (this.events.onStateSelectChanged != null) {
-                        this.events.onStateSelectChanged(idx);
-                    }
-                } else {
-                    this.board.cursorMesh.geometry = new THREE.BoxGeometry(20, 20, 20);
-                    if (this.events.onStateSelectChanged != null) {
-                        // deselect
-                        this.events.onStateSelectChanged(-1);
-                    }
+                this.boardP.cursorMeshIdx = idx;
+                if (this.events.onStateSelectChanged != null) {
+                    this.events.onStateSelectChanged(idx);
                 }
-                this.editContext.stateIdx = (this.editContext.stateIdx + 1) % (this.board.states.length + 1);
+                this.editContext.stateIdx = (this.editContext.stateIdx + 1) % (this.boardP.states.length + 1);
             }
         }
     }

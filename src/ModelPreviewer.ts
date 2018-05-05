@@ -46,6 +46,11 @@ export class ModelPreviewer extends ISelection {
         return this.renderer.domElement;
     }
 
+    public render(): void {
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+    }
+
     private init(params: IModelPreviewerCreateInfo): void {
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setClearColor(0x000000, 0);
@@ -68,14 +73,9 @@ export class ModelPreviewer extends ISelection {
         this.controls.enablePan = false;
         this.controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 
-        d3.select(this.renderer.domElement).on( "mousedown", this.redraw.bind(this))
-        .on("mousemove", this.redraw.bind(this))
-        .on("wheel", this.redraw.bind(this));
-        this.redraw();
-    }
-
-    private redraw(): void {
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        d3.select(this.renderer.domElement).on( "mousedown", this.render.bind(this))
+        .on("mousemove", this.render.bind(this))
+        .on("wheel", this.render.bind(this));
+        this.render();
     }
 }

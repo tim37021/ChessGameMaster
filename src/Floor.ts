@@ -6,6 +6,12 @@ interface IFloorCreateInfo {
     blockWidth: number;
 }
 
+interface IntersectInfo {
+    object: THREE.Object3D;
+    x: number;
+    y: number;
+}
+
 export class Floor {
     private dims: [number, number];
     private blocksP: THREE.Mesh[] = new Array();
@@ -33,6 +39,21 @@ export class Floor {
         }
     }
 
+    public intersect(raycaster: THREE.Raycaster): IntersectInfo {
+        const objs = raycaster.intersectObjects(this.blocks);
+        const w = this.blockWidthP;
+        const t = -this.dims[0] / 2 * 20;
+        const l = -this.dims[1] / 2 * 20;
+
+        if (objs.length > 0) {
+            const X = (objs[0].object.position.x - t - w / 2) / w;
+            const Y = (objs[0].object.position.y - l - w / 2) / w;
+            return {object: objs[0].object, x: X, y: Y};
+        } else {
+            return null;
+        }
+    }
+
     public get scene(): THREE.Scene {
         return this.sceneNode;
     }
@@ -47,6 +68,22 @@ export class Floor {
 
     public get cursorBlock(): THREE.Mesh {
         return this.cursorBlockP;
+    }
+
+    public set cursorPos(pos: [number, number]) {
+        const w = this.blockWidth;
+        const t = -this.dims[0] / 2 * this.blockWidth;
+        const l = -this.dims[1] / 2 * this.blockWidth;
+        this.cursorBlockP.position.x = t + pos[0] * w + w / 2;
+        this.cursorBlockP.position.y = l + pos[1] * w + w / 2;
+    }
+
+    public set enableCursor(val: boolean) {
+        this.cursorBlockP.visible = val;
+    }
+
+    public get enableCursor(): boolean {
+        return this.cursorBlockP.visible;
     }
 
     // return floor json
