@@ -10,6 +10,11 @@ g.state circle{
     stroke: black;
     stroke-width: 1px;
 }
+
+g.state text {
+    transform: translate(0, 5px);
+}
+
 /*
 g.state:hover circle{
     fill: rgb(200, 238, 241);
@@ -20,7 +25,6 @@ g.selected circle {
     stroke-width: 2px;
     transform: scale(1.05);
 }
-
 g.selected text {
     fill: white;
 }

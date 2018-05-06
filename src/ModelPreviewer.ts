@@ -15,6 +15,7 @@ export class ModelPreviewer extends ISelection {
     private camera: THREE.Camera;
     private controls: OrbitControls;
     private nameP: string;
+    private realMesh: THREE.Mesh;
 
     constructor(params: IModelPreviewerCreateInfo) {
         super();
@@ -23,16 +24,18 @@ export class ModelPreviewer extends ISelection {
     }
 
     public set mesh(mesh: THREE.Mesh) {
+        this.realMesh = mesh;
+        const fake = new THREE.Mesh(mesh.geometry.clone(), (mesh.material as THREE.Material).clone());
         if (this.scene.children.length > 2) {
-            this.scene.children[2] = mesh;
+            this.scene.children[2] = fake;
         } else {
-            this.scene.add(mesh);
+            this.scene.add(fake);
         }
     }
 
     public get mesh(): THREE.Mesh {
         if (this.scene.children.length > 2) {
-            return this.scene.children[2] as THREE.Mesh;
+            return this.realMesh;
         } else {
             return null;
         }

@@ -44,6 +44,7 @@ export class StateDiagram {
         onTransitionSelected: null,
     };
     private zoom: d3.ZoomBehavior<Element, {}>;
+    private editTextBar: d3.Selection<d3.BaseType, {}, null, undefined>;
 
     constructor(params: StateDiagramCreateInfo) {
         this.domElementP = d3.create("svg").classed("state-diagram", true).style("width", params.width)
@@ -82,6 +83,9 @@ export class StateDiagram {
         .attr("height", params.height)
         .style("fill", "#474747")
         .style("pointer-events", "all")
+        .on("click", () => {
+            this.editTextBar.style("display", "none");
+        })
         .call(this.zoom);
 
         d3.select(this.domElementP)
@@ -167,10 +171,28 @@ export class StateDiagram {
             d3.select(nodes[i]).raise();
         };
 
+        this.editTextBar = d3.create("div")
+        .attr("contenteditable", true)
+        .style("display", "none")
+        .classed("inputtext", true).on("keydown", () => {
+            if (d3.event.keyCode === 13) {
+                if (this.selected instanceof State) {
+                    this.selected.name = this.editTextBar.text();
+                    this.editTextBar.text("");
+                    this.update();
+                }
+                this.editTextBar.style("display", "none");
+            }
+        });
+
     }
 
     public get domElement(): SVGElement {
         return this.domElementP;
+    }
+
+    public get domElementInputBox(): HTMLDivElement {
+        return this.editTextBar.node() as HTMLDivElement;
     }
 
     public set states(arr: State[]) {
@@ -223,7 +245,7 @@ export class StateDiagram {
         .attr("transform", (d: any) => `translate(${d.x}, ${d.y})`)
         .classed("state", true)
         .on("click", this.onClicked.bind(this))
-        .on("dblclick", (elmnt) => {
+        .on("dblclick", (elmnt: any) => {
             if (this.events.onEditState != null) {
                 this.events.onEditState(elmnt);
             }
@@ -254,7 +276,20 @@ export class StateDiagram {
 
         enterstate.append("text")
         .attr("text-anchor", "middle")
-        .text((d: State) => { return d.name; });
+        .text((d: State) => { return d.name; })
+        .on("dblclick", (elmnt: any) => {
+            const transform = this.entryG.attr("transform");
+            const t = this.parseTranslate(transform);
+            const s = this.parseScale(transform);
+
+            this.editTextBar.style("display", null);
+            const w2 = this.domElementInputBox.clientWidth / 2;
+            const h2 = this.domElementInputBox.clientHeight / 2;
+
+            this.editTextBar
+            .text((elmnt as State).name)
+            .style("transform", `translate(calc(${t[0] + s * elmnt.x - w2}px), ${t[1] + s * elmnt.y - h2}px)`);
+        });
 
         newGs.exit().remove();
     }

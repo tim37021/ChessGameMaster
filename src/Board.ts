@@ -52,10 +52,10 @@ export class Board {
         const pieces = this.sigma.pieces;
         this.scenePieces = [];
         for (const p of pieces) {
-            const mesh = p.state.mesh.clone();
+            const mesh = new THREE.Mesh(p.state.mesh.geometry.clone(),
+                (p.state.mesh.material as THREE.Material).clone());
             mesh.position.x = t + p.x * w + w / 2;
             mesh.position.y = l + p.y * w + w / 2;
-            mesh.material = (p.state.mesh.material as THREE.Material).clone();
             // TODO: rotate by 90 elsewhere
             mesh.rotateX(Math.PI / 2);
             this.scene.add(mesh);

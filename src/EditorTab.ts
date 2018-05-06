@@ -52,8 +52,12 @@ export class EditorTab extends Tab {
         .append("div").classed("title", true)
         .append("span").classed("title-text", true)
         .text("State Diagram");
-        sdcontainer
-        .append("div").classed("content", true)
+
+        const content = sdcontainer
+        .append("div").classed("content", true);
+        content
+        .append(() => { return this.stateEditor.domElementInputBox; });
+        content
         .append(() => { return this.stateEditor.domElement; });
 
         this.rc = d3.select(this.workspaceDomElementP).append("div")

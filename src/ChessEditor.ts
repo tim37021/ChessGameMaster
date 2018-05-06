@@ -97,7 +97,7 @@ export class ChessEditor {
             const child: THREE.Mesh = object.children[0] as THREE.Mesh;
             object.material = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
             child.geometry.computeBoundingBox();
-            const length = child.geometry.boundingBox.max.y - child.geometry.boundingBox.min.y;
+            const length = child.geometry.boundingBox.max.x - child.geometry.boundingBox.min.x;
             const mid = child.geometry.boundingBox.min.add(child.geometry.boundingBox.max).multiplyScalar(-0.5);
             const mat = new THREE.Matrix4().set(
                 1, 0, 0, mid.x,
@@ -105,9 +105,9 @@ export class ChessEditor {
                 0, 0, 1, mid.z,
                 0, 0, 0, 1);
             const mat2 = new THREE.Matrix4().set(
-                20 / length, 0, 0, 0,
-                0, 20 / length, 0, 0,
-                0, 0, 20 / length, 0,
+                10 / length, 0, 0, 0,
+                0, 10 / length, 0, 0,
+                0, 0, 10 / length, 0,
                 0, 0, 0, 1);
 
             child.geometry.applyMatrix(mat2);
