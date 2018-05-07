@@ -1,0 +1,48 @@
+.movement-editor {
+    outline: none;
+    border:1px solid black;
+    border-bottom: 1px solid #999999;
+    background: #474747;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 10px auto 10px;
+    grid-template-columns: 10px auto 10px;
+    grid-template-areas: 
+        ". . ."
+        ". a ."
+        ". . ."
+}
+
+.movement-editor > div{
+    height: 300;
+    grid-area: a;
+    border: 1px solid black;
+}
+
+.movement-editor .movement-container {
+    height: 100%;
+    grid-area: a;
+
+    display: grid;
+    grid-auto-rows: 30px;
+    grid-row-gap: 5px;
+    justify-items: center;
+}
+
+.movement-editor .movement {
+    background: #333333;
+    width: 80%;
+}
+
+.movement-editor div.selected {
+    border: 1px solid rgb(227, 177, 26);;
+}
+
+.movement-editor .new-movement {
+    align-content: center;
+    vertical-align: middle;
+    background: #333333;
+    width: 80%;
+    border: 1px solid black;
+    border-top: 1px solid #999999;
+}

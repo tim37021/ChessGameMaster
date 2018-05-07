@@ -10,12 +10,14 @@ import { PieceState } from "./PieceState";
 import { Piece } from "./Piece";
 import { ISelection } from "./ISelection";
 import { State } from "./State";
+import { MovementEditor } from "./MovementEditor";
 
 export class EditorTab extends Tab {
     private imgPicker: Picker;
     private meshPicker: Picker;
     private chessEditorP: ChessEditor;
     private stateEditor: StateDiagram;
+    private movementEditor: MovementEditor;
     private workspaceDomElementP: HTMLElement = null;
     private lc: HTMLElement;
     private rc: HTMLElement;
@@ -45,13 +47,20 @@ export class EditorTab extends Tab {
         this.imgPicker = new Picker({imgWidth: 64, imgHeight: 64});
         sb.append("div").classed("imgpicker-container", true).append(() => { return this.imgPicker.domElement; });
 
-        // create mesh picker
+        // state editor and movement editor
         this.stateEditor = new StateDiagram({width: "100%", height: "100%"});
+        this.movementEditor = new MovementEditor();
+        this.movementEditor.visible = false;
+
         const sdcontainer = sb.append("div").classed("sd-container", true);
         sdcontainer
         .append("div").classed("title", true)
         .append("span").classed("title-text", true)
-        .text("State Diagram");
+        .text("State Diagram")
+        .on("click", () => {
+            this.stateEditor.visible = true;
+            this.movementEditor.visible = false;
+        });
 
         const content = sdcontainer
         .append("div").classed("content", true);
@@ -59,6 +68,8 @@ export class EditorTab extends Tab {
         .append(() => { return this.stateEditor.domElementInputBox; });
         content
         .append(() => { return this.stateEditor.domElement; });
+        content
+        .append(() => { return this.movementEditor.domElement; });
 
         this.rc = d3.select(this.workspaceDomElementP).append("div")
             .classed("workspace-right-column", true).node() as HTMLElement;
@@ -145,9 +156,12 @@ export class EditorTab extends Tab {
             const mpidx = this.meshPicker.selections.findIndex((selection: ISelection) => {
                 return (selection as ModelPreviewer).mesh === p.state.mesh;
             });
-            if (mpidx >= 0) {
-                this.meshPicker.selectionIndex = mpidx;
-            }
+            this.meshPicker.selectionIndex = mpidx;
+
+            const tidx = this.chessEditorP.textureList.findIndex((t) => {
+                return t.texture === p.texture;
+            });
+            this.imgPicker.selectionIndex = tidx;
         });
         this.imgPicker.on("changed", (idx: number) => {
             this.chessEditorP.setPreviewMaterial(idx);
@@ -169,6 +183,12 @@ export class EditorTab extends Tab {
                 this.meshPicker.selectionIndex = mpidx;
             }
             this.chessEditorP.setPreviewState(this.chessEditorP.board.states.indexOf(state));
+        });
+        this.stateEditor.on("editstate", (state: PieceState) => {
+            this.stateEditor.visible = false;
+            this.movementEditor.target = state;
+            this.movementEditor.update();
+            this.movementEditor.visible = true;
         });
     }
 }

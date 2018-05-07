@@ -19,4 +19,6 @@ export abstract class Movement {
         this.cond = cond;
     }
 
+    public abstract get descrption(): string;
+
 }

@@ -13,6 +13,8 @@ export class Piece {
     public y: number;
     public owner: number;
     public state: PieceState;
+    public texture: THREE.Texture = null;
+    public color: THREE.Color = new THREE.Color(0xFFFFFF);
 
     constructor(info: IPieceCreateInfo) {
         this.x = info.x;

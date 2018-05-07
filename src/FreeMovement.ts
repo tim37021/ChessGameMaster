@@ -44,4 +44,8 @@ export class FreeDeltaMovement extends Movement {
         return (newx >= 0 && newx <= sigma.dimension[0]) && (newy >= 0 && newy <= sigma.dimension[1]) &&
             (sigma.getPiece(newx, newy) == null);
     }
+
+    public get descrption(): string {
+        return `Delta move (${this.dx}, ${this.dy})`;
+    }
 }

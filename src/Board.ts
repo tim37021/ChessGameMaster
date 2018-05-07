@@ -58,6 +58,8 @@ export class Board {
             mesh.position.y = l + p.y * w + w / 2;
             // TODO: rotate by 90 elsewhere
             mesh.rotateX(Math.PI / 2);
+            (mesh.material as THREE.MeshPhongMaterial).map = p.texture;
+            (mesh.material as THREE.MeshPhongMaterial).color = p.color;
             this.scene.add(mesh);
             this.scenePieces.push(mesh);
         }

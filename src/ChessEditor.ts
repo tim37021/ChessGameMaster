@@ -23,7 +23,7 @@ interface IKeybinding {
 interface IEditContext {
     materialIdx: number;
     stateIdx: number;
-    selectedMesh: THREE.Mesh;
+    lastHovorMesh: THREE.Mesh;
 }
 
 interface ITextureInfo {
@@ -52,7 +52,7 @@ export class ChessEditor {
     private boardP: Board;
     private textures: ITextureInfo[] = new Array();
     private meshes: IMeshInfo[] = new Array();
-    private editContext: IEditContext = {materialIdx: 0, stateIdx: 0, selectedMesh: null};
+    private editContext: IEditContext = {materialIdx: 0, stateIdx: 0, lastHovorMesh: null};
     private mode: string;
     private events: IChessEditorEvent = {
         onMaterialSelectChanged: null,
@@ -74,6 +74,8 @@ export class ChessEditor {
     private gridHelper: THREE.GridHelper;
     // helper box
     private rollOverMaterial: THREE.Material;
+    private selectedMesh: THREE.Mesh = null;
+    private selectedPiece: Piece = null;
 
     constructor(params: IEditorCreateInfo) {
         this.dims = params.dims;
@@ -139,7 +141,14 @@ export class ChessEditor {
 
     public setPreviewMaterial(idx: number): void {
         this.editContext.materialIdx = idx;
-        this.floor.cursorBlock.material = new THREE.MeshPhongMaterial({map: this.textures[idx].texture});
+        if (this.mode === "editboard") {
+            this.floor.cursorBlock.material = new THREE.MeshPhongMaterial({map: this.textures[idx].texture});
+        } else if (this.mode === "normal" && this.selectedMesh != null) {
+            this.selectedPiece.texture = this.textures[idx].texture;;
+            ((this.selectedMesh as THREE.Mesh).material as THREE.MeshPhongMaterial).map =
+                this.textures[idx].texture;
+            ((this.selectedMesh as THREE.Mesh).material as THREE.Material).needsUpdate = true;
+        }
     }
 
     public setPreviewState(idx: number) {
@@ -281,6 +290,8 @@ export class ChessEditor {
         if (this.mode === "normal") {
             const intersect = this.boardP.intersect(this.raycaster);
             if (intersect != null) {
+                this.selectedMesh = intersect.object;
+                this.selectedPiece = intersect.p;
                 if (this.events.onPieceSelectChanged != null) {
                     this.events.onPieceSelectChanged(intersect.p);
                 }
@@ -319,13 +330,15 @@ export class ChessEditor {
 
         if (this.mode === "normal") {
             const intersect = this.boardP.intersect(this.raycaster);
-            if (this.editContext.selectedMesh != null) {
-                (this.editContext.selectedMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0xFFFFFF);
-                this.editContext.selectedMesh = null;
+            if (this.editContext.lastHovorMesh != null) {
+                (this.editContext.lastHovorMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0xFFFFFF);
+                (this.editContext.lastHovorMesh.material as THREE.Material).needsUpdate = true;
+                this.editContext.lastHovorMesh = null;
             }
             if (intersect != null) {
                 (intersect.object.material as THREE.MeshPhongMaterial).color = new THREE.Color(0x00FF00);
-                this.editContext.selectedMesh = intersect.object;
+                (intersect.object.material as THREE.Material).needsUpdate = true;
+                this.editContext.lastHovorMesh = intersect.object;
             }
         }
     }

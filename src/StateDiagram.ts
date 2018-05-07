@@ -278,6 +278,7 @@ export class StateDiagram {
         .attr("text-anchor", "middle")
         .text((d: State) => { return d.name; })
         .on("dblclick", (elmnt: any) => {
+            d3.event.stopPropagation();
             const transform = this.entryG.attr("transform");
             const t = this.parseTranslate(transform);
             const s = this.parseScale(transform);
@@ -355,6 +356,10 @@ export class StateDiagram {
         .on("end", () => {
             this.zoomer.call(this.zoom.translateTo, (state as any).x, (state as any).y);
         });
+    }
+
+    public set visible(val: boolean) {
+        d3.select(this.domElementP).style("display", val ? null : "none");
     }
 
     private parseTranslate(attr: string): [number, number] {
