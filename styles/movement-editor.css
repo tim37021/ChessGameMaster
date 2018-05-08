@@ -10,7 +10,7 @@
     grid-template-areas: 
         ". . ."
         ". a ."
-        ". . ."
+        ". . .";
 }
 
 .movement-editor > div{
@@ -22,27 +22,73 @@
 .movement-editor .movement-container {
     height: 100%;
     grid-area: a;
-
+    padding-top: 7.5px;
+    padding-left: 7.5px;
     display: grid;
     grid-auto-rows: 30px;
     grid-row-gap: 5px;
-    justify-items: center;
+    justify-items: left;
 }
 
 .movement-editor .movement {
-    background: #333333;
-    width: 80%;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    background: #666666;
+    width: 140px;
+    height: 20px;
+    border-radius: 15px;
+    border: 2px solid #666666;
+    padding-left: 12px;
+    padding-top: 3px;
+    font-size: 13px;
+}
+
+.movement-editor .movement:hover{
+    background: #999999;
+    border: 2px solid #999999;
 }
 
 .movement-editor div.selected {
-    border: 1px solid rgb(227, 177, 26);;
+    border: 1px solid #cc9933;
+    background-color: #545559;
+}
+
+.movement span{
+    margin-bottom: 3px;
+
+}
+
+.movement > div.movement-status{
+    display: inline-block;
+    margin-left: 8px;
+    margin-top: 1px;
+    width: 10px;
+    height: 10px;
+    background-color: #79C06D;
+    border-radius: 10px;
+    border: 2px solid #79C06D;
+}
+
+.movement > div.false{
+    background-color: #D80D2A;
+    border: 2px solid #D80D2A;
 }
 
 .movement-editor .new-movement {
     align-content: center;
     vertical-align: middle;
-    background: #333333;
-    width: 80%;
-    border: 1px solid black;
-    border-top: 1px solid #999999;
+    background: #474747;
+    width: 30px;
+    height: 30px;
+    color: white;
+    font-size: 28px;
+    margin-left: 125px;
+}
+
+.movement-editor .new-movement:hover{
+    color: #C5C5C5;
+}
+
+.movement-editor .new-movement:active{
+    color: #3E3E3E;
 }

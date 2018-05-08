@@ -58,23 +58,20 @@ export class MovementEditor {
 
         const entry = this.innerBox.selectAll(".movement").data(this.targetP.movements);
 
-        entry.text((elmnt) => {
-            return elmnt.descrption;
-        }).classed("selected", (elmnt) => {
+        entry.classed("selected", (elmnt) => {
             return elmnt === this.selectedP;
         }).on("click", (elmnt, i, nodes) => {
             d3.event.stopPropagation();
             this.selected = elmnt;
         }).each((elmnt, i, nodes) => {
             (elmnt as any).domElement = nodes[i];
+        }).select("span").text((elmnt) => {
+            return elmnt.descrption;
         });
 
-        entry.enter()
+        const newone = entry.enter()
         .insert("div", ".new-movement")
         .classed("movement", true)
-        .text((elmnt) => {
-            return elmnt.descrption;
-        })
         .each((elmnt, i, nodes) => {
             (elmnt as any).domElement = nodes[i];
         })
@@ -87,6 +84,11 @@ export class MovementEditor {
             this.fdcreator.visible = true;
             this.fdcreator.translate = [d3.event.clientX, d3.event.clientY];
         });
+        newone.append("span").text((elmnt) => {
+            return elmnt.descrption;
+        });
+        newone.append("div")
+        .classed("movement-status", true);
 
         entry.exit().remove();
     }
