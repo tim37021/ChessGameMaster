@@ -19,6 +19,8 @@ export abstract class Movement {
         this.cond = cond;
     }
 
+    public abstract getMovePosition(p: Piece): [number, number];
+    public abstract getAttackPosition(p: Piece): [number, number];
     public abstract get descrption(): string;
 
 }

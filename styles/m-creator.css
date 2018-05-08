@@ -1,0 +1,44 @@
+.fd-creator {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    padding: 7.5px;
+    left: 0px;
+    top: 0px;
+    background: #333333;
+    z-index: 1;
+    border: 1px solid black;
+}
+
+.fd-creator .grid-box {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-gap: 1px;
+    height: 100%;
+}
+
+.fd-creator .grid-box > div {
+    background: white;
+}
+
+.fd-creator .grid-box > div:hovor {
+    background: #21caca;
+    opacity: 0.5;
+}
+
+.fd-creator .grid-box > div.piece {
+    background: black;
+}
+
+
+.fd-creator .grid-box > div.attack {
+    background: red;
+}
+
+.fd-creator .grid-box > div.move {
+    background: blue;
+}
+
+.fd-creator .grid-box > div.both {
+    background:  linear-gradient(red, blue);
+}

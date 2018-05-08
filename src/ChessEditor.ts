@@ -5,6 +5,7 @@ import {Floor} from "./Floor";
 import {Stack} from "./Stack";
 import { PieceState } from "./PieceState";
 import { Piece } from "./Piece";
+import { MovementPreviewer } from "./MovementPreviewer";
 // 以any方式引入 防止typescript哀號
 const {OBJLoader}: any = require("../src/OBJLoader.js");
 // 怒把THREE裡的prototype 換成真的實作
@@ -76,6 +77,7 @@ export class ChessEditor {
     private rollOverMaterial: THREE.Material;
     private selectedMesh: THREE.Mesh = null;
     private selectedPiece: Piece = null;
+    private movementPreviewer: MovementPreviewer;
 
     constructor(params: IEditorCreateInfo) {
         this.dims = params.dims;
@@ -144,7 +146,7 @@ export class ChessEditor {
         if (this.mode === "editboard") {
             this.floor.cursorBlock.material = new THREE.MeshPhongMaterial({map: this.textures[idx].texture});
         } else if (this.mode === "normal" && this.selectedMesh != null) {
-            this.selectedPiece.texture = this.textures[idx].texture;;
+            this.selectedPiece.texture = this.textures[idx].texture;
             ((this.selectedMesh as THREE.Mesh).material as THREE.MeshPhongMaterial).map =
                 this.textures[idx].texture;
             ((this.selectedMesh as THREE.Mesh).material as THREE.Material).needsUpdate = true;
@@ -156,16 +158,23 @@ export class ChessEditor {
         this.boardP.cursorMeshIdx = idx;
     }
 
+    public updateMovementPreview(): void {
+        this.movementPreviewer.update(this.boardP.worldState);
+    }
+
     public set editMode(mode: string) {
         if (mode === "editboard") {
             this.mode = "editboard";
             this.boardP.scene.visible = false;
+            this.movementPreviewer.scene.visible = false;
         } else if (mode === "placepiece") {
             this.mode = "placepiece";
             this.boardP.scene.visible = true;
+            this.movementPreviewer.scene.visible = false;
         } else {
             this.mode = "normal";
             this.boardP.scene.visible = true;
+            this.movementPreviewer.scene.visible = true;
         }
         this.floor.cursorBlock.visible = false;
     }
@@ -226,6 +235,10 @@ export class ChessEditor {
         this.floor = new Floor({dims: this.dims, blockWidth: 20});
         this.floor.scene.position.z = 20;
         this.scene.add(this.floor.scene);
+
+        this.movementPreviewer = new MovementPreviewer({dims: this.dims, blockWidth: 20});
+        this.movementPreviewer.scene.position.z = 30.01;
+        this.scene.add(this.movementPreviewer.scene);
 
         this.boardP = new Board({dims: this.dims, blockWidth: 20});
         this.boardP.scene.position.z = 30;
@@ -290,11 +303,19 @@ export class ChessEditor {
         if (this.mode === "normal") {
             const intersect = this.boardP.intersect(this.raycaster);
             if (intersect != null) {
+                if (this.selectedMesh != null) {
+                    (this.selectedMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0xFFFFFF);
+                    (this.selectedMesh.material as THREE.Material).needsUpdate = true;
+                }
                 this.selectedMesh = intersect.object;
                 this.selectedPiece = intersect.p;
+                (this.selectedMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0x00FF00);
+                (this.selectedMesh.material as THREE.Material).needsUpdate = true;
                 if (this.events.onPieceSelectChanged != null) {
                     this.events.onPieceSelectChanged(intersect.p);
                 }
+                this.movementPreviewer.piece = intersect.p;
+                this.updateMovementPreview();
             }
         }
     }
@@ -330,7 +351,7 @@ export class ChessEditor {
 
         if (this.mode === "normal") {
             const intersect = this.boardP.intersect(this.raycaster);
-            if (this.editContext.lastHovorMesh != null) {
+            if (this.editContext.lastHovorMesh !== null && this.editContext.lastHovorMesh !== this.selectedMesh) {
                 (this.editContext.lastHovorMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0xFFFFFF);
                 (this.editContext.lastHovorMesh.material as THREE.Material).needsUpdate = true;
                 this.editContext.lastHovorMesh = null;

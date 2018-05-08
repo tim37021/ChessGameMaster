@@ -70,6 +70,8 @@ export class EditorTab extends Tab {
         .append(() => { return this.stateEditor.domElement; });
         content
         .append(() => { return this.movementEditor.domElement; });
+        content
+        .append(() => { return this.movementEditor.creatorDomElement; });
 
         this.rc = d3.select(this.workspaceDomElementP).append("div")
             .classed("workspace-right-column", true).node() as HTMLElement;
@@ -171,6 +173,9 @@ export class EditorTab extends Tab {
             if (this.stateEditor.selected instanceof State) {
                 (this.stateEditor.selected as PieceState).mesh = (this.meshPicker.selection as ModelPreviewer).mesh;
             }
+        });
+        this.movementEditor.on("change", (p) => {
+            this.chessEditorP.updateMovementPreview();
         });
         this.stateEditor.on("new", () => {
             return new PieceState("UNTITLED", this.defaultMesh);
