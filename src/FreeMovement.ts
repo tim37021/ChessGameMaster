@@ -37,13 +37,19 @@ export class FreeDeltaMovement extends Movement {
         }
         p.x += this.dx;
         p.y += this.dy;
+        p.steps ++;
     }
 
     public movable(sigma: WorldState, p: Piece): boolean {
         const newx = p.x + this.dx;
         const newy = p.y + this.dy;
+        const anewx = p.x + this.attackDx;
+        const anewy = p.y + this.attackDy;
+
+        // if next position is within board and there's no piece occupying
+        // unless attackPos == movePos
         return (newx >= 0 && newx <= sigma.dimension[0]) && (newy >= 0 && newy <= sigma.dimension[1]) &&
-            (sigma.getPiece([newx, newy]) == null);
+            ((this.isAttack && newx === anewx && newy === anewy) || (sigma.getPiece([newx, newy]) == null));
     }
 
 

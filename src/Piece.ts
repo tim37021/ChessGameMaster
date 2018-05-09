@@ -14,6 +14,7 @@ export class Piece {
     public y: number;
     public owner: number;
     public state: PieceState;
+    public steps: number;
     public texture: THREE.Texture = null;
     public color: THREE.Color = new THREE.Color(0xFFFFFF);
     public rotation: THREE.Euler = new THREE.Euler();

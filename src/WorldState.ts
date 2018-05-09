@@ -6,6 +6,7 @@ interface WorldStateCreateInfo {
 export class WorldState {
     private piecesP: Piece[] = new Array();
     private dims: [number, number];
+    private steps: number = 0;
 
     constructor(info: WorldStateCreateInfo) {
         this.dims = info.dims;
@@ -55,4 +56,7 @@ export class WorldState {
         return this.piecesP;
     }
 
+    public nextStep() {
+        this.steps ++;
+    }
 }

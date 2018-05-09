@@ -184,16 +184,21 @@ export class ChessEditor {
             this.mode = "editboard";
             this.boardP.scene.visible = false;
             this.movementPreviewer.scene.visible = false;
+            this.floor.cursorBlock.visible = true;
         } else if (mode === "placepiece") {
             this.mode = "placepiece";
             this.boardP.scene.visible = true;
             this.movementPreviewer.scene.visible = false;
+            this.floor.cursorBlock.visible = false;
+        } else if (mode === "play") {
+            this.mode = "play";
         } else {
             this.mode = "normal";
             this.boardP.scene.visible = true;
             this.movementPreviewer.scene.visible = true;
+            this.floor.cursorBlock.visible = false;
         }
-        this.floor.cursorBlock.visible = false;
+        
     }
 
     public get editMode(): string {

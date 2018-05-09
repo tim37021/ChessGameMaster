@@ -66,6 +66,8 @@ export class EditorTab extends Tab {
             new ProgrammableCondition("Enemy exists",
                 `sigma.getPiece(m.getAttackPosition(p))!=null`),
             new ProgrammableCondition("King is dead", `sigma.getPiecesByStateName("King").length===0`),
+            new ProgrammableCondition("Been moved",
+                `p.steps>=1`),
         ];
         this.condSelector.update();
         this.condSelector.visible = true;
