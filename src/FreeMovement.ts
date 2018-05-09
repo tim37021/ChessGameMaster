@@ -16,21 +16,21 @@ interface IFreeMovementCreateInfo {
 export class FreeDeltaMovement extends Movement {
     public dx: number;
     public dy: number;
-    public isAttack: boolean;
+    public isAttackP: boolean;
     public attackDx: number;
     public attackDy: number;
     constructor(params: IFreeMovementCreateInfo) {
         super();
         this.dx = params.dx;
         this.dy = params.dy;
-        this.isAttack = (params.isAttack === undefined ? false : params.isAttack);
+        this.isAttackP = (params.isAttack === undefined ? false : params.isAttack);
         this.attackDx = (params.attackDx === undefined ? 0 : params.attackDx);
         this.attackDy = (params.attackDy === undefined ? 0 : params.attackDy);
     }
 
     public exec(sigma: WorldState, p: Piece): void {
 
-        if (this.isAttack) {
+        if (this.isAttackP) {
             // remove the piece
             const ap = sigma.getPiece(p.x + this.attackDx, p.y + this.attackDy);
             sigma.removePiece(ap);
@@ -55,8 +55,12 @@ export class FreeDeltaMovement extends Movement {
         return [p.x + this.attackDx, p.y + this.attackDy];
     }
 
+    public get isAttack(): boolean {
+        return this.isAttackP;
+    }
+
     public get descrption(): string {
-        return `Delta move (${this.dx}, ${this.dy})`;
+        return `Move by (${this.dx}, ${this.dy})`;
     }
 }
 

@@ -8,6 +8,8 @@ export abstract class Movement {
     public abstract exec(sigma: WorldState, p: Piece): void;
     public abstract movable(sigma: WorldState, p: Piece): boolean;
 
+    public abstract get isAttack(): boolean;
+
     public get hasCondition(): boolean {
         return this.conditionsP.length > 0;
     }

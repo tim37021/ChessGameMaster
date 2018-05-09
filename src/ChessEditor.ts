@@ -162,6 +162,19 @@ export class ChessEditor {
         this.boardP.cursorMeshIdx = idx;
     }
 
+    public setMovementPreviewMask(mask: boolean[]) {
+        let changed = false;
+        for (let i = 0; i < this.movementPreviewer.mask.length; i++) {
+            if (this.movementPreviewer.mask[i] !== mask[i]) {
+                changed = true;
+            }
+            this.movementPreviewer.mask[i] = mask[i];
+        }
+        if (changed) {
+            this.movementPreviewer.update(this.boardP.worldState);
+        }
+    }
+
     public updateMovementPreview(): void {
         this.movementPreviewer.update(this.boardP.worldState);
     }

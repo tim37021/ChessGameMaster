@@ -214,6 +214,10 @@ export class StateDiagram {
         })
         .each((data: Transition, i: number, nodes: Element[]) => {
             (data as any).domElement = nodes[i];
+        }).on("dblclick", (t) => {
+            if (this.events.onEditTransition) {
+                this.events.onEditTransition(t);
+            }
         });
 
         transitions
@@ -225,6 +229,11 @@ export class StateDiagram {
             return `M${l.srcState.x},${l.srcState.y}L${l.dstState.x},${l.dstState.y}`;
         })
         .on("click", this.onClicked.bind(this))
+        .on("dblclick", (t) => {
+            if (this.events.onEditTransition) {
+                this.events.onEditTransition(t);
+            }
+        })
         .each((data: Transition, i: number, nodes: Element[]) => {
             (data as any).domElement = nodes[i];
         });

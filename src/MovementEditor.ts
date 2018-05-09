@@ -6,6 +6,7 @@ import { Movement } from "./Movement";
 interface MovementEditorEvents {
     onChanged?: (m: PieceState) => void;
     onCondSelector?: (m: Movement) => void;
+    onPreviewMaskChanged?: (mask: boolean[]) => void;
 }
 
 export class MovementEditor {
@@ -32,6 +33,14 @@ export class MovementEditor {
             }
             this.selected = null;
             this.fdcreator.visible = false;
+        })
+        .on("mousemove", () => {
+            // show all movement
+            const mask: boolean[] = new Array(this.targetP.movements.length);
+            mask.fill(true);
+            if (this.events.onPreviewMaskChanged) {
+                this.events.onPreviewMaskChanged(mask);
+            }
         });
         this.fdcreator = new FreeDeltaMovementCreator();
         this.fdcreator.visible = false;
@@ -90,6 +99,15 @@ export class MovementEditor {
         .each((elmnt, i, nodes) => {
             (elmnt as any).domElement = nodes[i];
         })
+        .on("mousemove", (elmnt) => {
+            d3.event.stopPropagation();
+            const mask: boolean[] = new Array(this.targetP.movements.length);
+            mask.fill(false);
+            mask[this.targetP.movements.indexOf(elmnt)] = true;
+            if (this.events.onPreviewMaskChanged) {
+                this.events.onPreviewMaskChanged(mask);
+            }
+        })
         .on("click", (elmnt, i, nodes) => {
             d3.event.stopPropagation();
             this.selected = elmnt;
@@ -146,6 +164,9 @@ export class MovementEditor {
         }
         if (ename === "condselector") {
             this.events.onCondSelector = cbk;
+        }
+        if (ename === "maskchange") {
+            this.events.onPreviewMaskChanged = cbk;
         }
     }
 

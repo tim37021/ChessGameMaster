@@ -13,7 +13,7 @@ interface MovementPreviewerCreateInfo {
 export class MovementPreviewer {
     private dims: [number, number];
     private target: Piece;
-    private maskP: boolean[];
+    private maskP: boolean[] = new Array();
     private meshes: THREE.Mesh[] = new Array();
     private plane: THREE.Geometry;
     private blockWidth: number;
@@ -59,10 +59,15 @@ export class MovementPreviewer {
                     if (!this.checkMovableP || this.target.state.movements[i].movable(sigma, this.target)) {
                         const next = this.target.state.movements[i].getMovePosition(this.target);
                         const plane = this.buildPreviewPlane(next, this.moveColor);
-                        this.meshes.push(this.buildPreviewPlane(next, this.moveColor));
-                        // const anext = this.target.state.movements[i].getAttackPosition(this.target);
-                        // this.meshes.push(this.buildPreviewPlane(anext, this.attackColor));
+                        this.meshes.push(plane);
                         this.sceneP.add(plane);
+                        if (this.target.state.movements[i].isAttack) {
+                            const anext = this.target.state.movements[i].getAttackPosition(this.target);
+                            const aplane = this.buildPreviewPlane(anext, this.attackColor);
+                            aplane.position.z += 0.1;
+                            this.meshes.push(aplane);
+                            this.sceneP.add(aplane);
+                        }
                     }
 
                     if (!this.checkConditionP || this.target.state.movements[i].checkConditions(sigma, this.target)) {

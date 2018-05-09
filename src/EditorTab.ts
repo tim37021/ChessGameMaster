@@ -14,6 +14,7 @@ import { MovementEditor } from "./MovementEditor";
 import { ConditionSelector } from "./ConditionsSelector";
 import { ProgrammableCondition } from "./ProgrammableCondition";
 import { Movement } from "./Movement";
+import { Transition } from "./Transition";
 
 export class EditorTab extends Tab {
     private imgPicker: Picker;
@@ -66,14 +67,16 @@ export class EditorTab extends Tab {
         this.condSelector.visible = true;
 
         const sdcontainer = sb.append("div").classed("sd-container", true);
-        sdcontainer
-        .append("div").classed("title", true)
-        .append("span").classed("title-text", true)
+        const title = sdcontainer.append("div").classed("title", true);
+        title.append("span").classed("title-text", true)
         .text("State Diagram")
-        .on("click", () => {
+        .on("click", (elmnt, i, nodes: HTMLElement[]) => {
             this.stateEditor.visible = true;
             this.movementEditor.visible = false;
+            title.select(".subtitle-text").text("");
         });
+        title.append("span").classed("subtitle-text", true)
+        .text("");
 
         const content = sdcontainer
         .append("div").classed("content", true);
@@ -180,6 +183,9 @@ export class EditorTab extends Tab {
                 return t.texture === p.texture;
             });
             this.imgPicker.selectionIndex = tidx;
+            this.movementEditor.target = p.state;
+            this.movementEditor.update();
+            d3.select(this.workspaceDomElementP).select(".subtitle-text").text(p.state.name);
         });
         this.imgPicker.on("changed", (idx: number) => {
             this.chessEditorP.setPreviewMaterial(idx);
@@ -199,6 +205,15 @@ export class EditorTab extends Tab {
             this.condSelector.visible = true;
             this.condSelector.translate = [d3.event.clientX, d3.event.clientY];
         });
+        this.movementEditor.on("maskchange", (mask: boolean[]) => {
+            this.chessEditorP.setMovementPreviewMask(mask);
+        });
+        this.stateEditor.on("edittransition", (t: Transition) => {
+            this.condSelector.selected = t.conditions;
+            this.condSelector.update();
+            this.condSelector.visible = true;
+            this.condSelector.translate = [d3.event.clientX, d3.event.clientY];
+        })
         this.stateEditor.on("new", () => {
             return new PieceState("UNTITLED", this.defaultMesh);
         });
@@ -216,6 +231,7 @@ export class EditorTab extends Tab {
             this.movementEditor.target = state;
             this.movementEditor.update();
             this.movementEditor.visible = true;
+            d3.select(this.workspaceDomElementP).select(".subtitle-text").text(state.name);
         });
     }
 }
