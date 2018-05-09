@@ -16,6 +16,7 @@ interface IntersectInfo {
 }
 
 export class Board {
+    public cursorTexture: THREE.Texture = null;
     private sigma: WorldState;
     private sceneNode: THREE.Scene = new THREE.Scene();
     private statesP: PieceState[] = new Array();
@@ -73,7 +74,7 @@ export class Board {
             return;
         }
         const np = new Piece({x: this.cursorPosP[0], y: this.cursorPosP[1],
-            owner: 0, state: this.statesP[this.stateIdx]});
+            owner: 0, state: this.statesP[this.stateIdx], texture: this.cursorTexture});
         np.rotation.copy(this.cursorMesh.rotation);
         this.sigma.pushPiece(np);
         this.prepareScene();

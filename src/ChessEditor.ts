@@ -152,6 +152,8 @@ export class ChessEditor {
             ((this.selectedMesh as THREE.Mesh).material as THREE.MeshPhongMaterial).map =
                 this.textures[idx].texture;
             ((this.selectedMesh as THREE.Mesh).material as THREE.Material).needsUpdate = true;
+        } else if (this.mode === "placepiece") {
+            this.boardP.cursorTexture = this.textures[idx].texture;
         }
     }
 

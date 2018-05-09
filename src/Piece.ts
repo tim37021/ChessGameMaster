@@ -6,6 +6,7 @@ interface IPieceCreateInfo {
     y: number;
     owner: number;
     state: PieceState;
+    texture?: THREE.Texture;
 }
 
 export class Piece {
@@ -22,6 +23,7 @@ export class Piece {
         this.y = info.y;
         this.owner = info.owner;
         this.state = info.state;
+        this.texture = info.texture ? info.texture : null;
     }
 
     public encode(): string {
