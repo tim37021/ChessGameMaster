@@ -10,21 +10,21 @@ export class ConditionSelector {
     private editingCondition: Condition = null;
     private editingNode: d3.Selection<d3.BaseType, {}, null, undefined>;
 
-    //Set a timer flag to toggle dbclick and disabl single click
-    //Not used
-    private dbstatus: Boolean = false;
+    // Set a timer flag to toggle dbclick and disabl single click
+    // Not used
+    private dbstatus: boolean = false;
     private dbtimer: any;
 
     constructor() {
         this.domElementP = d3.create("div").classed("cond-selector", true).attr("tabindex", 0)
             .on("click", () => {
                 if (this.editingCondition != null) {
-                    (this.editingCondition as ProgrammableCondition).code = 
+                    (this.editingCondition as ProgrammableCondition).code =
                         this.editingNode.select(".editcontent").text();
-                    this.editingNode.classed("edited",false).html("");
+                    this.editingNode.classed("edited", false).html("");
                     this.editingCondition = null;
                     this.update();
-                } 
+                }
             });
         this.innerBox = this.domElementP.append("div");
     }
@@ -54,20 +54,18 @@ export class ConditionSelector {
                 if (idx > -1) {
                     this.selectedP.splice(idx, 1);
                 }
-            } 
-            if(this.editingCondition != elmnt){
-                console.log(this.editingNode)
-                console.log(d3.select(nodes[key]))
+            }
+            if (this.editingCondition !== elmnt) {
                 if (this.editingCondition != null) {
-                    (this.editingCondition as ProgrammableCondition).code = 
+                    (this.editingCondition as ProgrammableCondition).code =
                         this.editingNode.select(".editcontent").text();
-                    this.editingNode.classed("edited",false).html("");
+                    this.editingNode.classed("edited", false).html("");
                     this.editingCondition = null;
                     this.update();
                 }
             }
         }).on("dblclick", (elmnt, key, nodes) =>{
-            if(d3.select(nodes[key]).classed("edited")){
+            if (d3.select(nodes[key]).classed("edited")){
                 d3.select(nodes[key]).html("").append("a").text(elmnt.name);
             }
             d3.selectAll(".edited").classed("edited", false);
@@ -79,12 +77,12 @@ export class ConditionSelector {
             .text((elmnt as ProgrammableCondition).code);
             this.editingCondition = elmnt;
             this.editingNode = d3.select(nodes[key]);
-        }).on("keydown", (elmnt, key, nodes) =>{
-            if(d3.event.key =="Enter"){
+        }).on("keydown", (elmnt, key, nodes) => {
+            if (d3.event.key === "Enter") {
                 if (this.editingCondition != null) {
-                    (this.editingCondition as ProgrammableCondition).code = 
+                    (this.editingCondition as ProgrammableCondition).code =
                         this.editingNode.select(".editcontent").text();
-                    this.editingNode.classed("edited",false).html("");
+                    this.editingNode.classed("edited", false).html("");
                     this.editingCondition = null;
                     this.update();
                 }
@@ -92,7 +90,7 @@ export class ConditionSelector {
         }).each((elmnt, key, nodes) => {
             (elmnt as any).domElement = nodes[key];
         }).append("a")
-        .text((elmnt) =>{
+        .text((elmnt) => {
             return elmnt.name;
         });
 
