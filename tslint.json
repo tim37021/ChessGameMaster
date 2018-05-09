@@ -18,7 +18,8 @@
     "only-arrow-functions": false,
     "ordered-imports": false,
     "no-var-requires": false,
-    "no-eval": false
+    "no-eval": false,
+    "object-literal-sort-keys": false
   },
   "jsRules": {
     "max-line-length": {
