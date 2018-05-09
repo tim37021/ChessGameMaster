@@ -1,0 +1,37 @@
+.cond-selector {
+    width: 144px;
+    height: 256px;
+    background: #333333;
+    z-index: 1;
+    border: 1px solid black;
+    position: absolute;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 2px;
+    left: 0px;
+    top: 100px;
+}
+
+.cond-selector > div {
+    overflow-y: scroll;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-auto-rows: 30px;
+    grid-row-gap: 5px;
+    justify-items: left;
+}
+
+.cond-selector .condition {
+    width: 120px;
+    border-radius: 5px;
+    background: #666666;
+}
+
+.cond-selector .condition:hover:not(.selected) {
+    background: #999999;
+}
+
+.cond-selector .condition.selected  {
+    border: 1px solid #cc9933;
+}

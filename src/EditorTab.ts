@@ -11,6 +11,8 @@ import { Piece } from "./Piece";
 import { ISelection } from "./ISelection";
 import { State } from "./State";
 import { MovementEditor } from "./MovementEditor";
+import { ConditionSelector } from "./ConditionsSelector";
+import { ProgrammableCondition } from "./ProgrammableCondition";
 
 export class EditorTab extends Tab {
     private imgPicker: Picker;
@@ -22,6 +24,7 @@ export class EditorTab extends Tab {
     private lc: HTMLElement;
     private rc: HTMLElement;
     private defaultMesh: THREE.Mesh;
+    private condSelector: ConditionSelector;
 
     constructor(name: string) {
         super(name);
@@ -52,6 +55,11 @@ export class EditorTab extends Tab {
         this.movementEditor = new MovementEditor();
         this.movementEditor.visible = false;
 
+        this.condSelector = new ConditionSelector();
+        this.condSelector.conditions = [new ProgrammableCondition("A", `1+1`), new ProgrammableCondition("B", `1+1`)];
+        this.condSelector.update();
+        this.condSelector.visible = true;
+
         const sdcontainer = sb.append("div").classed("sd-container", true);
         sdcontainer
         .append("div").classed("title", true)
@@ -72,6 +80,8 @@ export class EditorTab extends Tab {
         .append(() => { return this.movementEditor.domElement; });
         content
         .append(() => { return this.movementEditor.creatorDomElement; });
+        content
+        .append(() => { return this.condSelector.domElement; });
 
         this.rc = d3.select(this.workspaceDomElementP).append("div")
             .classed("workspace-right-column", true).node() as HTMLElement;

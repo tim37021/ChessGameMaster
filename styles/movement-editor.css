@@ -43,14 +43,14 @@
     font-size: 13px;
 }
 
-.movement-editor .movement:hover{
+.movement-editor .movement:hover:not(.selected) {
     background: #999999;
     border: 2px solid #999999;
 }
 
 .movement-editor div.selected {
     border: 1px solid #cc9933;
-    background-color: #545559;
+    background-color: #999999;
 }
 
 .movement span{

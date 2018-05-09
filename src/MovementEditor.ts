@@ -49,6 +49,7 @@ export class MovementEditor {
         });
 
         this.fdcreator = new FreeDeltaMovementCreator();
+        this.fdcreator.visible = false;
     }
 
     public update(): void {

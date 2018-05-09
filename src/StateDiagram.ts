@@ -145,7 +145,7 @@ export class StateDiagram {
             if (mind < 2500) {
                 if (this.dragState.transitionRules.filter((d: Transition) => d.dstState === minState).length === 0) {
                     this.dragState.transitionRules.push(
-                        new ProgrammableTransition(minState, () => { return true; }, () => { return; }));
+                        new ProgrammableTransition(minState, `(sigma, p) => {}`));
                     this.update();
                 }
             }
