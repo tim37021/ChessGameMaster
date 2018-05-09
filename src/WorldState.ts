@@ -1,5 +1,5 @@
 import {Piece} from "./Piece";
-interface IWorldStateCreateInfo {
+interface WorldStateCreateInfo {
     dims: [number, number];
 }
 
@@ -7,7 +7,7 @@ export class WorldState {
     private piecesP: Piece[] = new Array();
     private dims: [number, number];
 
-    constructor(info: IWorldStateCreateInfo) {
+    constructor(info: WorldStateCreateInfo) {
         this.dims = info.dims;
     }
 
