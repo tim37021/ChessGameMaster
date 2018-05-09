@@ -56,9 +56,13 @@ export class EditorTab extends Tab {
         this.movementEditor.visible = false;
 
         this.condSelector = new ConditionSelector();
-        this.condSelector.conditions = [new ProgrammableCondition("A", `1+1`), new ProgrammableCondition("B", `1+1`)];
+        this.condSelector.conditions = [
+            new ProgrammableCondition("Enemy exists",
+                `sigma.getPiece(m.getAttackPosition(p))!=null`),
+            new ProgrammableCondition("B", `1+1`),
+        ];
         this.condSelector.update();
-        this.condSelector.visible = false;
+        this.condSelector.visible = true;
 
         const sdcontainer = sb.append("div").classed("sd-container", true);
         sdcontainer

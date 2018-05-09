@@ -10,22 +10,40 @@
     border-radius: 2px;
     left: 0px;
     top: 100px;
+    outline: none;
 }
 
 .cond-selector > div {
     overflow-y: scroll;
     width: 100%;
     height: 100%;
-    display: grid;
-    grid-auto-rows: 30px;
-    grid-row-gap: 5px;
+    display: block;
     justify-items: left;
 }
 
 .cond-selector .condition {
     width: 120px;
+    height: 30px;
     border-radius: 5px;
-    background: #666666;
+    background: #5E5E5E;
+    color: white;
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.condition .editcontent{
+    color: #F8BA00;
+    margin-top: 5px;
+    padding-left: 5px;
+    outline: none;
+    border: 1px solid #E0E0E0;
+
+}
+
+.cond-selector .condition.edited{
+    width: 120px;
+    height: 70px;
+    background-color: #8D8D8D;
 }
 
 .cond-selector .condition:hover:not(.selected) {
