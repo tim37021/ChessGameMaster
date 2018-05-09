@@ -19,6 +19,8 @@ interface IEditorCreateInfo {
 
 interface IKeybinding {
     SWITCHMATERIAL: number;
+    DELETE: number;
+    ROTATE: number;
 }
 
 interface IEditContext {
@@ -46,7 +48,7 @@ interface IChessEditorEvent {
 }
 
 export class ChessEditor {
-    public keybinding: IKeybinding = {SWITCHMATERIAL: 9};
+    public keybinding: IKeybinding = {SWITCHMATERIAL: 9, DELETE: 46, ROTATE: 34};
 
     private dims: [number, number];
     private floor: Floor;
@@ -395,6 +397,29 @@ export class ChessEditor {
                     this.events.onStateSelectChanged(idx);
                 }
                 this.editContext.stateIdx = (this.editContext.stateIdx + 1) % (this.boardP.states.length + 1);
+            }
+        }
+
+        if (event.keyCode === this.keybinding.DELETE) {
+            if (this.mode === "normal") {
+                if (this.selectedPiece != null) {
+                    const idx = this.boardP.worldState.pieces.indexOf(this.selectedPiece);
+                    this.boardP.worldState.pieces.splice(idx, 1);
+                    this.boardP.prepareScene();
+                }
+            }
+        }
+
+        if (event.keyCode === this.keybinding.ROTATE) {
+            if (this.mode === "normal") {
+                if (this.selectedPiece != null) {
+                    this.selectedPiece.rotation.z += Math.PI / 2;
+                    this.boardP.prepareScene();
+                }
+            }
+
+            if (this.mode === "placepiece") {
+                this.boardP.cursorMesh.rotation.y += Math.PI / 2;
             }
         }
     }

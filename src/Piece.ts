@@ -15,6 +15,7 @@ export class Piece {
     public state: PieceState;
     public texture: THREE.Texture = null;
     public color: THREE.Color = new THREE.Color(0xFFFFFF);
+    public rotation: THREE.Euler = new THREE.Euler();
 
     constructor(info: IPieceCreateInfo) {
         this.x = info.x;

@@ -57,7 +57,7 @@ export class Board {
             mesh.position.x = t + p.x * w + w / 2;
             mesh.position.y = l + p.y * w + w / 2;
             // TODO: rotate by 90 elsewhere
-            mesh.rotateX(Math.PI / 2);
+            mesh.rotation.copy(p.rotation);
             (mesh.material as THREE.MeshPhongMaterial).map = p.texture;
             (mesh.material as THREE.MeshPhongMaterial).color = p.color;
             this.scene.add(mesh);
@@ -72,8 +72,10 @@ export class Board {
         if (filter.length >= 1 || this.stateIdx === -1) {
             return;
         }
-        this.sigma.pushPiece(
-            new Piece({x: this.cursorPosP[0], y: this.cursorPosP[1], owner: 0, state: this.statesP[this.stateIdx]}));
+        const np = new Piece({x: this.cursorPosP[0], y: this.cursorPosP[1],
+            owner: 0, state: this.statesP[this.stateIdx]});
+        np.rotation.copy(this.cursorMesh.rotation);
+        this.sigma.pushPiece(np);
         this.prepareScene();
     }
 
