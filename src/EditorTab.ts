@@ -58,7 +58,7 @@ export class EditorTab extends Tab {
         this.condSelector = new ConditionSelector();
         this.condSelector.conditions = [new ProgrammableCondition("A", `1+1`), new ProgrammableCondition("B", `1+1`)];
         this.condSelector.update();
-        this.condSelector.visible = true;
+        this.condSelector.visible = false;
 
         const sdcontainer = sb.append("div").classed("sd-container", true);
         sdcontainer
