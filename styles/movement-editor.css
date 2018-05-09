@@ -93,7 +93,7 @@
     transform: scale(1.05);
 }
 
-.movement > div.false{
+.movement > div.movement-status.false{
     background-color: #D80D2A;
     border: 2px solid #D80D2A;
 }

@@ -32,7 +32,7 @@ export class FreeDeltaMovement extends Movement {
 
         if (this.isAttackP) {
             // remove the piece
-            const ap = sigma.getPiece(p.x + this.attackDx, p.y + this.attackDy);
+            const ap = sigma.getPiece([p.x + this.attackDx, p.y + this.attackDy]);
             sigma.removePiece(ap);
         }
         p.x += this.dx;
@@ -43,7 +43,7 @@ export class FreeDeltaMovement extends Movement {
         const newx = p.x + this.dx;
         const newy = p.y + this.dy;
         return (newx >= 0 && newx <= sigma.dimension[0]) && (newy >= 0 && newy <= sigma.dimension[1]) &&
-            (sigma.getPiece(newx, newy) == null);
+            (sigma.getPiece([newx, newy]) == null);
     }
 
 

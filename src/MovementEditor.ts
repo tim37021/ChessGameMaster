@@ -2,6 +2,8 @@ import * as d3 from "d3";
 import { FreeDeltaMovement, FreeDeltaMovementCreator } from "./FreeMovement";
 import { PieceState } from "./PieceState";
 import { Movement } from "./Movement";
+import { WorldState } from "./WorldState";
+import { Piece } from "./Piece";
 
 interface MovementEditorEvents {
     onChanged?: (m: PieceState) => void;
@@ -10,6 +12,7 @@ interface MovementEditorEvents {
 }
 
 export class MovementEditor {
+    private targetPieceP: Piece = null;
     private d3root: d3.Selection<Element, undefined, null, undefined>;
     private innerBox: d3.Selection<d3.BaseType, undefined, null, undefined>;
     private creatorBox: d3.Selection<d3.BaseType, undefined, null, undefined>;
@@ -17,8 +20,10 @@ export class MovementEditor {
     private selectedP: Movement = null;
     private fdcreator: FreeDeltaMovementCreator;
     private events: MovementEditorEvents = {};
+    private sigma: WorldState;
 
-    constructor() {
+    constructor(sigma: WorldState) {
+        this.sigma = sigma;
         this.d3root = d3.create("div").classed("movement-editor", true).attr("tabindex", "0");
         this.d3root
         .on("keydown", this.onKeydown.bind(this))
@@ -91,7 +96,10 @@ export class MovementEditor {
         entry.select("span").text((elmnt) => {
             return elmnt.descrption;
         });
-        entry.select(".movement-status").on("click", msCbk);
+        entry.select(".movement-status")
+        .classed("false", (m: Movement) => {
+            return !(this.targetPieceP == null || m.checkConditions(this.sigma, this.targetPieceP));
+        }).on("click", msCbk);
 
         const newone = entry.enter()
         .insert("div", ".new-movement")
@@ -121,7 +129,9 @@ export class MovementEditor {
         });
         newone.append("div")
         .classed("movement-status", true)
-        .on("click", msCbk);
+        .classed("false", (m: Movement) => {
+            return !(this.targetPieceP == null || m.checkConditions(this.sigma, this.targetPieceP));
+        }).on("click", msCbk);
 
         entry.exit().remove();
     }
@@ -137,6 +147,13 @@ export class MovementEditor {
 
     public get target(): PieceState {
         return this.targetP;
+    }
+
+    public set targetPiece(p: Piece) {
+        this.targetPieceP = p;
+        if (p.state !== this.targetP) {
+            this.targetPieceP = null;
+        }
     }
 
     public set visible(val: boolean) {

@@ -37,6 +37,15 @@ export class EditorTab extends Tab {
         if (this.workspaceDomElementP != null && this.workspaceDomElementP.parentElement != null) {
             this.workspaceDomElementP.parentElement.removeChild(this.workspaceDomElementP);
         }
+        this.chessEditorP = new ChessEditor({dims: [8, 8], width: 0, height: 1});
+        // state editor and movement editor
+        this.stateEditor = new StateDiagram({width: "100%", height: "100%"});
+        this.movementEditor = new MovementEditor(this.chessEditorP.board.worldState);
+        this.condSelector = new ConditionSelector();
+        this.meshPicker = new Picker({imgWidth: 128, imgHeight: 128});
+        // create image picker
+        this.imgPicker = new Picker({imgWidth: 64, imgHeight: 64});
+
         this.workspaceDomElementP = d3.create("div").classed("workspace", true)
             .style("display", "none").node() as HTMLElement;
 
@@ -45,19 +54,14 @@ export class EditorTab extends Tab {
 
         const sb = d3.select(this.lc).append("div").classed("sidebar", true);
 
-        this.meshPicker = new Picker({imgWidth: 128, imgHeight: 128});
+
         sb.append("div").classed("meshpicker-container", true).append(() => { return this.meshPicker.domElement; });
 
-        // create image picker
-        this.imgPicker = new Picker({imgWidth: 64, imgHeight: 64});
+
         sb.append("div").classed("imgpicker-container", true).append(() => { return this.imgPicker.domElement; });
 
-        // state editor and movement editor
-        this.stateEditor = new StateDiagram({width: "100%", height: "100%"});
-        this.movementEditor = new MovementEditor();
         this.movementEditor.visible = false;
 
-        this.condSelector = new ConditionSelector();
         this.condSelector.conditions = [
             new ProgrammableCondition("Enemy exists",
                 `sigma.getPiece(m.getAttackPosition(p))!=null`),
@@ -92,7 +96,6 @@ export class EditorTab extends Tab {
         this.rc = d3.select(this.workspaceDomElementP).append("div")
             .classed("workspace-right-column", true).node() as HTMLElement;
 
-        this.chessEditorP = new ChessEditor({dims: [8, 8], width: 0, height: 1});
         this.rc.appendChild(this.chessEditorP.domElement);
 
         // share...
@@ -184,6 +187,7 @@ export class EditorTab extends Tab {
             });
             this.imgPicker.selectionIndex = tidx;
             this.movementEditor.target = p.state;
+            this.movementEditor.targetPiece = p;
             this.movementEditor.update();
             d3.select(this.workspaceDomElementP).select(".subtitle-text").text(p.state.name);
         });
@@ -213,7 +217,7 @@ export class EditorTab extends Tab {
             this.condSelector.update();
             this.condSelector.visible = true;
             this.condSelector.translate = [d3.event.clientX, d3.event.clientY];
-        })
+        });
         this.stateEditor.on("new", () => {
             return new PieceState("UNTITLED", this.defaultMesh);
         });

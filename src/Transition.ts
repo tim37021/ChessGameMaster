@@ -3,6 +3,7 @@ import {State} from "./State";
 import {WorldState} from "./WorldState";
 import { Condition } from "./Condition";
 import { PieceState } from "./PieceState";
+import { Movement } from "./Movement";
 
 export abstract class Transition {
     private conditionsP: Condition[] = new Array();
@@ -10,9 +11,9 @@ export abstract class Transition {
     constructor(dst: State) {
         this.dstStateP = dst;
     }
-    public checkConditions(sigma: WorldState, p: Piece): boolean {
+    public checkConditions(sigma: WorldState, p: Piece, m: Movement): boolean {
         for (const cond of this.conditionsP) {
-            if (!cond.eval(sigma, p)) {
+            if (!cond.eval(sigma, p, m)) {
                 return false;
             }
         }

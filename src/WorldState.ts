@@ -25,10 +25,10 @@ export class WorldState {
         return false;
     }
 
-    public getPiece(x: number, y: number): Piece {
+    public getPiece(xy: [number, number]): Piece {
         let result: Piece = null;
         [].forEach.call(this.piecesP, (e: Piece) => {
-            if (e.x === x && e.y === y) {
+            if (e.x === xy[0] && e.y === xy[1]) {
                 result = e;
             }
         });
@@ -54,4 +54,5 @@ export class WorldState {
     public get pieces(): Piece[] {
         return this.piecesP;
     }
+
 }

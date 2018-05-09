@@ -16,7 +16,7 @@ export abstract class Movement {
 
     public checkConditions(sigma: WorldState, p: Piece): boolean {
         for (const cond of this.conditionsP) {
-            if (!cond.eval(sigma, p)) {
+            if (!cond.eval(sigma, p, this)) {
                 return false;
             }
         }

@@ -88,7 +88,7 @@ export class Board {
         if (objs.length > 0) {
             const X = (objs[0].object.position.x - t - w / 2) / w;
             const Y = (objs[0].object.position.y - l - w / 2) / w;
-            const P = this.worldState.getPiece(X, Y);
+            const P = this.worldState.getPiece([X, Y]);
             return {object: objs[0].object as THREE.Mesh, p: P, x: X, y: Y};
         } else {
             return null;
