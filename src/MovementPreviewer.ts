@@ -65,7 +65,7 @@ export class MovementPreviewer {
                         this.sceneP.add(plane);
                     }
 
-                    if (!this.checkConditionP || this.target.state.movements[i].checkCondition(sigma, this.target)) {
+                    if (!this.checkConditionP || this.target.state.movements[i].checkConditions(sigma, this.target)) {
                         //
                     }
                 }

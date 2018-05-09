@@ -1,22 +1,32 @@
 import {Piece} from "./Piece";
 import {WorldState} from "./WorldState";
+import { Condition } from "./Condition";
 
 export abstract class Movement {
-    private cond: (sigma: WorldState, p: Piece) => boolean = null;
+    private conditionsP: Condition[] = new Array();
 
     public abstract exec(sigma: WorldState, p: Piece): void;
     public abstract movable(sigma: WorldState, p: Piece): boolean;
 
     public get hasCondition(): boolean {
-        return this.cond != null;
+        return this.conditionsP.length > 0;
     }
 
-    public checkCondition(sigma: WorldState, p: Piece): boolean {
-        return this.cond(sigma, p);
+    public checkConditions(sigma: WorldState, p: Piece): boolean {
+        for (const cond of this.conditionsP) {
+            if (!cond.eval(sigma, p)) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public set condition(cond: (sigma: WorldState, p: Piece) => boolean) {
-        this.cond = cond;
+    public get conditions(): Condition[] {
+        return this.conditionsP;
+    }
+
+    public set conditions(conds: Condition[]) {
+        this.conditionsP = conds;
     }
 
     public abstract getMovePosition(p: Piece): [number, number];
