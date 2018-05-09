@@ -5,11 +5,13 @@ import { Movement } from "./Movement";
 
 interface MovementEditorEvents {
     onChanged?: (m: PieceState) => void;
+    onCondSelector?: (m: Movement) => void;
 }
 
 export class MovementEditor {
     private d3root: d3.Selection<Element, undefined, null, undefined>;
     private innerBox: d3.Selection<d3.BaseType, undefined, null, undefined>;
+    private creatorBox: d3.Selection<d3.BaseType, undefined, null, undefined>;
     private targetP: PieceState = null;
     private selectedP: Movement = null;
     private fdcreator: FreeDeltaMovementCreator;
@@ -20,7 +22,6 @@ export class MovementEditor {
         this.d3root
         .on("keydown", this.onKeydown.bind(this))
         .on("click", () => {
-            d3.event.stopPropagation();
             if (this.selectedP != null && this.fdcreator.visible) {
                 const idx = this.targetP.movements.indexOf(this.selectedP);
                 this.targetP.movements[idx] = this.fdcreator.get();
@@ -32,8 +33,13 @@ export class MovementEditor {
             this.selected = null;
             this.fdcreator.visible = false;
         });
+        this.fdcreator = new FreeDeltaMovementCreator();
+        this.fdcreator.visible = false;
 
-        const outer = this.d3root.append("div").style("overflow-y", "scroll").style("max-height", "100%");
+        const outer = this.d3root.append("div").classed("movement-outerbox", true)
+            .style("overflow-y", "scroll").style("max-height", "100%");
+        const creatorBox = this.d3root.append("div").classed("creator-outerbox", true);
+        creatorBox.append(() => {return this.fdcreator.domElement; });
         this.innerBox = outer.append("div").classed("movement-container", true);
         this.innerBox.append("div")
         .classed("new-movement", true)
@@ -48,8 +54,7 @@ export class MovementEditor {
             this.update();
         });
 
-        this.fdcreator = new FreeDeltaMovementCreator();
-        this.fdcreator.visible = false;
+
     }
 
     public update(): void {
@@ -59,6 +64,13 @@ export class MovementEditor {
 
         const entry = this.innerBox.selectAll(".movement").data(this.targetP.movements);
 
+        const msCbk = (elmnt: Movement) => {
+            d3.event.stopPropagation();
+            if (this.events.onCondSelector) {
+                this.events.onCondSelector(elmnt);
+            }
+        };
+
         entry.classed("selected", (elmnt) => {
             return elmnt === this.selectedP;
         }).on("click", (elmnt, i, nodes) => {
@@ -66,9 +78,11 @@ export class MovementEditor {
             this.selected = elmnt;
         }).each((elmnt, i, nodes) => {
             (elmnt as any).domElement = nodes[i];
-        }).select("span").text((elmnt) => {
+        });
+        entry.select("span").text((elmnt) => {
             return elmnt.descrption;
         });
+        entry.select(".movement-status").on("click", msCbk);
 
         const newone = entry.enter()
         .insert("div", ".new-movement")
@@ -83,23 +97,19 @@ export class MovementEditor {
         .on("dblclick", (elmnt, i, nodes) => {
             d3.event.stopPropagation();
             this.fdcreator.visible = true;
-            this.fdcreator.translate = [d3.event.clientX, d3.event.clientY];
         });
         newone.append("span").text((elmnt) => {
             return elmnt.descrption;
         });
         newone.append("div")
-        .classed("movement-status", true);
+        .classed("movement-status", true)
+        .on("click", msCbk);
 
         entry.exit().remove();
     }
 
     public get domElement(): HTMLDivElement {
         return this.d3root.node() as HTMLDivElement;
-    }
-
-    public get creatorDomElement(): HTMLDivElement {
-        return this.fdcreator.domElement;
     }
 
     public set target(state: PieceState) {
@@ -133,6 +143,9 @@ export class MovementEditor {
     public on(ename: string, cbk: (e: any) => void) {
         if (ename === "change") {
             this.events.onChanged = cbk;
+        }
+        if (ename === "condselector") {
+            this.events.onCondSelector = cbk;
         }
     }
 

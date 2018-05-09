@@ -5,18 +5,38 @@
     background: #474747;
     height: 100%;
     display: grid;
-    grid-template-rows: 10px auto 10px;
-    grid-template-columns: 10px auto 10px;
+    grid-template-rows: 10px 1fr 1fr 10px;
+    grid-template-columns: 10px 1fr 1fr 10px;
+    grid-template-areas: 
+        ". . . ."
+        ". a b ."
+        ". a b ."
+        ". . . .";
+    grid-column-gap: 10px;
+}
+
+.movement-editor > .movement-outerbox {
+    height: 300;
+    grid-area: a;
+    border: 1px solid black;
+}
+
+.movement-editor > .creator-outerbox {
+    height: 300;
+    grid-area: b;
+    border: 1px solid black;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: 
         ". . ."
         ". a ."
         ". . .";
 }
 
-.movement-editor > div{
-    height: 300;
+.creator-outerbox > .creator {
     grid-area: a;
-    border: 1px solid black;
+    
 }
 
 .movement-editor .movement-container {
@@ -67,6 +87,10 @@
     background-color: #79C06D;
     border-radius: 10px;
     border: 2px solid #79C06D;
+}
+
+.movement > div.movement-status:hover {
+    transform: scale(1.05);
 }
 
 .movement > div.false{

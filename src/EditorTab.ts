@@ -13,6 +13,7 @@ import { State } from "./State";
 import { MovementEditor } from "./MovementEditor";
 import { ConditionSelector } from "./ConditionsSelector";
 import { ProgrammableCondition } from "./ProgrammableCondition";
+import { Movement } from "./Movement";
 
 export class EditorTab extends Tab {
     private imgPicker: Picker;
@@ -59,7 +60,7 @@ export class EditorTab extends Tab {
         this.condSelector.conditions = [
             new ProgrammableCondition("Enemy exists",
                 `sigma.getPiece(m.getAttackPosition(p))!=null`),
-            new ProgrammableCondition("B", `1+1`),
+            new ProgrammableCondition("King is dead", `sigma.getPiecesByStateName("King").length===0`),
         ];
         this.condSelector.update();
         this.condSelector.visible = true;
@@ -82,8 +83,6 @@ export class EditorTab extends Tab {
         .append(() => { return this.stateEditor.domElement; });
         content
         .append(() => { return this.movementEditor.domElement; });
-        content
-        .append(() => { return this.movementEditor.creatorDomElement; });
         content
         .append(() => { return this.condSelector.domElement; });
 
@@ -152,6 +151,9 @@ export class EditorTab extends Tab {
     }
 
     private setupEvents(): void {
+        d3.select(this.workspaceDomElementP).on("click", () => {
+            this.condSelector.visible = false;
+        });
         this.chessEditorP.on("mapcursormaterial", (idx: number) => {
             this.imgPicker.selectionIndex = idx;
         });
@@ -190,6 +192,12 @@ export class EditorTab extends Tab {
         });
         this.movementEditor.on("change", (p) => {
             this.chessEditorP.updateMovementPreview();
+        });
+        this.movementEditor.on("condselector", (m: Movement) => {
+            this.condSelector.selected = m.conditions;
+            this.condSelector.update();
+            this.condSelector.visible = true;
+            this.condSelector.translate = [d3.event.clientX, d3.event.clientY];
         });
         this.stateEditor.on("new", () => {
             return new PieceState("UNTITLED", this.defaultMesh);

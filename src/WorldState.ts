@@ -34,6 +34,13 @@ export class WorldState {
         });
         return result;
     }
+
+    public getPiecesByStateName(name: string): Piece[] {
+        return this.piecesP.filter((p) => {
+            return p.state.name === name;
+        });
+    }
+
     // removing null is accept
     public removePiece(p: Piece): boolean {
         const idx = this.piecesP.indexOf(p, 0);

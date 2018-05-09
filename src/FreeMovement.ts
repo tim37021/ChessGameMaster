@@ -65,7 +65,7 @@ export class FreeDeltaMovementCreator {
     private gridBox: d3.Selection<d3.BaseType, undefined, null, undefined>;
 
     constructor() {
-        this.domElementP = d3.create("div").classed("fd-creator", true);
+        this.domElementP = d3.create("div").classed("fd-creator", true).classed("creator", true);
         this.gridBox = this.domElementP.append("div").classed("grid-box", true);
         for (let i = 0; i < 49; i++) {
             const grid = this.gridBox.append("div");
@@ -73,24 +73,21 @@ export class FreeDeltaMovementCreator {
                 grid.classed("piece", true);
             } else {
                 grid.on("mousedown", (elmnt, key, nodes) => {
+                    d3.event.stopPropagation();
                     const sel = d3.select(nodes[key]);
-                    let move = sel.classed("move") || sel.classed("both");
-                    let attack = sel.classed("attack") || sel.classed("both");
+                    let move = sel.classed("move");
+                    let attack = sel.classed("attack");
                     if (d3.event.button === 0) {
                         move = !move;
                     }
                     if (d3.event.button === 2) {
                         attack = !attack;
                     }
-                    if (move && attack) {
-                        sel.classed("move", false);
-                        sel.classed("attack", false);
-                        sel.classed("both", true);
-                    } else {
-                        sel.classed("move", move);
-                        sel.classed("attack", attack);
-                        sel.classed("both", false);
-                    }
+
+                    sel.classed("move", move);
+                    sel.classed("attack", attack);
+                }).on("click", () => {
+                    d3.event.stopPropagation();
                 });
             }
         }

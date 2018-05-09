@@ -32,6 +32,9 @@ export class ConditionSelector {
     public update(): void {
         const entry = this.innerBox.selectAll(".condition").data(this.conditionsP);
         entry
+        .classed("selected", (elmnt: Condition) => {
+            return this.selectedP.indexOf(elmnt) > -1;
+        })
         .text((elmnt) => {
             return elmnt.name;
         }).each((elmnt, key, nodes) => {
@@ -41,6 +44,9 @@ export class ConditionSelector {
         entry.enter()
         .append("div")
         .classed("condition", true)
+        .classed("selected", (elmnt: Condition) => {
+            return this.selectedP.indexOf(elmnt) > -1;
+        })
         .on("click", (elmnt, key, nodes) => {
             d3.event.stopPropagation();
             const sel = !d3.select(nodes[key]).classed("selected");
@@ -64,8 +70,8 @@ export class ConditionSelector {
                     this.update();
                 }
             }
-        }).on("dblclick", (elmnt, key, nodes) =>{
-            if (d3.select(nodes[key]).classed("edited")){
+        }).on("dblclick", (elmnt, key, nodes) => {
+            if (d3.select(nodes[key]).classed("edited")) {
                 d3.select(nodes[key]).html("").append("a").text(elmnt.name);
             }
             d3.selectAll(".edited").classed("edited", false);
@@ -105,6 +111,10 @@ export class ConditionSelector {
         return this.selectedP;
     }
 
+    public set selected(conds: Condition[]) {
+        this.selectedP = conds;
+    }
+
     public get domElement(): HTMLDivElement {
         return this.domElementP.node() as HTMLDivElement;
     }
@@ -115,5 +125,9 @@ export class ConditionSelector {
 
     public set visible(val: boolean) {
         this.domElementP.style("display", val ? null : "none");
+    }
+
+    public set translate(val: [number, number]) {
+        this.domElementP.style("transform", `translate(${val[0]}px, ${val[1]}px)`);
     }
 }

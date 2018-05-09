@@ -1,12 +1,10 @@
 .fd-creator {
-    position: absolute;
     width: 150px;
     height: 150px;
     padding: 7.5px;
     left: 0px;
     top: 0px;
     background: #333333;
-    z-index: 1;
     border: 1px solid black;
 }
 
@@ -39,6 +37,6 @@
     background: blue;
 }
 
-.fd-creator .grid-box > div.both {
+.fd-creator .grid-box > div.move.attack {
     background:  linear-gradient(red, blue);
 }

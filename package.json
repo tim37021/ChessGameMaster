@@ -22,16 +22,13 @@
   "devDependencies": {
     "@types/d3": "^5.0.0",
     "@types/three": "^0.91.10",
-    "source-map-loader": "^0.2.3",
     "ts-loader": "^4.2.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.6.2",
-    "webpack-cli": "^2.0.15"
+    "typescript": "^2.6.2"
   },
   "dependencies": {
     "d3": "^5.1.0",
     "electron": "^1.8.4",
-    "imports-loader": "^0.8.0",
     "three": "^0.92.0",
     "three-orbitcontrols-ts": "^0.1.2"
   }
