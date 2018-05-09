@@ -13,7 +13,7 @@ export abstract class State {
     public checkCandidateState(sigma: WorldState, p: Piece): State[] {
         const passed: State[] = [];
         this.transitionRules.forEach((r: Transition) => {
-            if (r.check(sigma, p)) {
+            if (r.checkConditions(sigma, p)) {
                 passed.push(r.dstState);
             }
         });

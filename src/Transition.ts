@@ -10,7 +10,7 @@ export abstract class Transition {
     constructor(dst: State) {
         this.dstStateP = dst;
     }
-    public check(sigma: WorldState, p: Piece): boolean {
+    public checkConditions(sigma: WorldState, p: Piece): boolean {
         for (const cond of this.conditionsP) {
             if (!cond.eval(sigma, p)) {
                 return false;
