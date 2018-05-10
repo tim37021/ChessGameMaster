@@ -140,13 +140,15 @@ export class EditorTab extends Tab {
     }
 
     public loadMesh(filename: string): void {
-        this.chessEditor.registerGeometry("UNTITLED", filename, (mesh: THREE.Mesh) => {
-            const mp = new ModelPreviewer({name: "UNTITLED", width: 128, height: 128});
+        const regex = /[A-Za-z]?[:]?[\\\/]?.*[\/\\](.*)\..*/;
+        const fname = regex.exec(filename)[1];
+        this.chessEditor.registerGeometry(fname, filename, (mesh: THREE.Mesh) => {
+            const mp = new ModelPreviewer({name: fname, width: 128, height: 128});
             mp.mesh = mesh;
             mp.render();
             this.meshPicker.selections.push(mp);
             this.meshPicker.update();
-            const newstate = new PieceState("UNTITLED", mesh);
+            const newstate = new PieceState(fname, mesh);
             this.stateEditor.states.push(newstate);
             this.stateEditor.update();
         });
