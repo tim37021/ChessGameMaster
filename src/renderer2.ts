@@ -91,6 +91,12 @@ window.onload = () => {
         }
     });
 
+    d3.selectAll(".playbtn").on("click.cl", () => {
+        if (tabstrip.activeTab != null) {
+            (tabstrip.activeTab as EditorTab).chessEditor.editMode = "play";
+        }
+    });
+
     d3.selectAll(".placepiecebtn").on("click.cl", () => {
         if (tabstrip.activeTab != null) {
             (tabstrip.activeTab as EditorTab).chessEditor.editMode = "placepiece";

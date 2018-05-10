@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { Movement } from "./Movement";
 import { Piece } from "./Piece";
 import { WorldState } from "./WorldState";
+import { PieceState } from "./PieceState";
 
 
 interface IFreeMovementCreateInfo {
@@ -29,27 +30,32 @@ export class FreeDeltaMovement extends Movement {
     }
 
     public exec(sigma: WorldState, p: Piece): void {
+        const newxy = this.getMovePosition(p);
+        const anewxy = this.getAttackPosition(p);
 
         if (this.isAttackP) {
             // remove the piece
-            const ap = sigma.getPiece([p.x + this.attackDx, p.y + this.attackDy]);
+            const ap = sigma.getPiece(anewxy);
             sigma.removePiece(ap);
         }
-        p.x += this.dx;
-        p.y += this.dy;
+        p.x = newxy[0];
+        p.y = newxy[1];
         p.steps ++;
+
+        const states = p.state.checkCandidateState(sigma, p, this);
+        if (states.length === 1) {
+            p.state = states[0] as PieceState;
+        }
     }
 
     public movable(sigma: WorldState, p: Piece): boolean {
-        const newx = p.x + this.dx;
-        const newy = p.y + this.dy;
-        const anewx = p.x + this.attackDx;
-        const anewy = p.y + this.attackDy;
+        const newxy = this.getMovePosition(p);
+        const anewxy = this.getAttackPosition(p);
 
         // if next position is within board and there's no piece occupying
         // unless attackPos == movePos
-        return (newx >= 0 && newx <= sigma.dimension[0]) && (newy >= 0 && newy <= sigma.dimension[1]) &&
-            ((this.isAttack && newx === anewx && newy === anewy) || (sigma.getPiece([newx, newy]) == null));
+        return (newxy[0] >= 0 && newxy[0] <= sigma.dimension[0]) && (newxy[1] >= 0 && newxy[1] <= sigma.dimension[1]) &&
+            ((this.isAttack && newxy[0] === anewxy[0] && newxy[1] === anewxy[1]) || (sigma.getPiece(newxy) == null));
     }
 
 

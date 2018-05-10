@@ -21,6 +21,7 @@ interface IKeybinding {
     SWITCHMATERIAL: number;
     DELETE: number;
     ROTATE: number;
+    QUIT: number;
 }
 
 interface IEditContext {
@@ -48,7 +49,7 @@ interface IChessEditorEvent {
 }
 
 export class ChessEditor {
-    public keybinding: IKeybinding = {SWITCHMATERIAL: 9, DELETE: 46, ROTATE: 34};
+    public keybinding: IKeybinding = {SWITCHMATERIAL: 9, DELETE: 46, ROTATE: 34, QUIT: 27};
 
     private dims: [number, number];
     private floor: Floor;
@@ -78,7 +79,7 @@ export class ChessEditor {
     // helper box
     private rollOverMaterial: THREE.Material;
     private selectedMesh: THREE.Mesh = null;
-    private selectedPiece: Piece = null;
+    private selectedPieceP: Piece = null;
     private movementPreviewer: MovementPreviewer;
 
     constructor(params: IEditorCreateInfo) {
@@ -148,7 +149,7 @@ export class ChessEditor {
         if (this.mode === "editboard") {
             this.floor.cursorBlock.material = new THREE.MeshPhongMaterial({map: this.textures[idx].texture});
         } else if (this.mode === "normal" && this.selectedMesh != null) {
-            this.selectedPiece.texture = this.textures[idx].texture;
+            this.selectedPieceP.texture = this.textures[idx].texture;
             ((this.selectedMesh as THREE.Mesh).material as THREE.MeshPhongMaterial).map =
                 this.textures[idx].texture;
             ((this.selectedMesh as THREE.Mesh).material as THREE.Material).needsUpdate = true;
@@ -185,20 +186,33 @@ export class ChessEditor {
             this.boardP.scene.visible = false;
             this.movementPreviewer.scene.visible = false;
             this.floor.cursorBlock.visible = true;
+            this.movementPreviewer.piece = null;
+            this.movementPreviewer.update(this.boardP.worldState);
         } else if (mode === "placepiece") {
             this.mode = "placepiece";
             this.boardP.scene.visible = true;
             this.movementPreviewer.scene.visible = false;
             this.floor.cursorBlock.visible = false;
+            this.movementPreviewer.piece = null;
+            this.movementPreviewer.update(this.boardP.worldState);
         } else if (mode === "play") {
             this.mode = "play";
+            this.selectedPiece = null;
+            this.movementPreviewer.checkConditions = true;
+            this.movementPreviewer.checkMovable = true;
+            this.movementPreviewer.piece = null;
+            this.movementPreviewer.update(this.boardP.worldState);
         } else {
             this.mode = "normal";
             this.boardP.scene.visible = true;
             this.movementPreviewer.scene.visible = true;
             this.floor.cursorBlock.visible = false;
+            this.selectedPiece = null;
+            this.movementPreviewer.checkConditions = false;
+            this.movementPreviewer.checkMovable = false;
+            this.movementPreviewer.piece = null;
+            this.movementPreviewer.update(this.boardP.worldState);
         }
-        
     }
 
     public get editMode(): string {
@@ -233,6 +247,14 @@ export class ChessEditor {
         } else if (ename === "pieceselectchange") {
             this.events.onPieceSelectChanged = cbk;
         }
+    }
+
+    public set selectedPiece(p: Piece) {
+        if (this.selectedMesh != null) {
+            (this.selectedMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0xFFFFFF);
+            (this.selectedMesh.material as THREE.Material).needsUpdate = true;
+        }
+        this.selectedPieceP = p;
     }
 
     private init(width: number, height: number): void {
@@ -330,7 +352,7 @@ export class ChessEditor {
                     (this.selectedMesh.material as THREE.Material).needsUpdate = true;
                 }
                 this.selectedMesh = intersect.object;
-                this.selectedPiece = intersect.p;
+                this.selectedPieceP = intersect.p;
                 (this.selectedMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0x00FF00);
                 (this.selectedMesh.material as THREE.Material).needsUpdate = true;
                 if (this.events.onPieceSelectChanged != null) {
@@ -338,6 +360,33 @@ export class ChessEditor {
                 }
                 this.movementPreviewer.piece = intersect.p;
                 this.updateMovementPreview();
+            }
+        }
+
+        if (this.mode === "play") {
+            // choose piece and place...
+            if (this.selectedPieceP == null) {
+                const intersect = this.boardP.intersect(this.raycaster);
+                if (intersect != null) {
+                    this.selectedPiece = intersect.p;
+                    this.selectedMesh = intersect.object;
+                    (this.selectedMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0x00FF00);
+                    (this.selectedMesh.material as THREE.Material).needsUpdate = true;
+                    if (this.events.onPieceSelectChanged != null) {
+                        this.events.onPieceSelectChanged(intersect.p);
+                    }
+                    this.movementPreviewer.piece = intersect.p;
+                    this.updateMovementPreview();
+                }
+            } else {
+                const m = this.movementPreviewer.intersectMovement(this.raycaster);
+                if (m != null) {
+                    m.exec(this.boardP.worldState, this.selectedPieceP);
+                    this.movementPreviewer.piece = null;
+                    this.movementPreviewer.update(this.boardP.worldState);
+                    this.boardP.prepareScene();
+                    this.selectedPiece = null;
+                }
             }
         }
     }
@@ -371,7 +420,7 @@ export class ChessEditor {
             }
         }
 
-        if (this.mode === "normal") {
+        if (this.mode === "normal" || this.mode === "play") {
             const intersect = this.boardP.intersect(this.raycaster);
             if (this.editContext.lastHovorMesh !== null && this.editContext.lastHovorMesh !== this.selectedMesh) {
                 (this.editContext.lastHovorMesh.material as THREE.MeshPhongMaterial).color = new THREE.Color(0xFFFFFF);
@@ -422,8 +471,8 @@ export class ChessEditor {
 
         if (event.keyCode === this.keybinding.DELETE) {
             if (this.mode === "normal") {
-                if (this.selectedPiece != null) {
-                    const idx = this.boardP.worldState.pieces.indexOf(this.selectedPiece);
+                if (this.selectedPieceP != null) {
+                    const idx = this.boardP.worldState.pieces.indexOf(this.selectedPieceP);
                     this.boardP.worldState.pieces.splice(idx, 1);
                     this.boardP.prepareScene();
                 }
@@ -432,16 +481,16 @@ export class ChessEditor {
 
         if (event.keyCode === this.keybinding.ROTATE) {
             if (this.mode === "normal") {
-                if (this.selectedPiece != null) {
-                    this.selectedPiece.rotation.z += Math.PI / 2;
-                    if (this.selectedPiece.rotation.z > Math.PI * 2) {
-                        this.selectedPiece.rotation.z = 0;
+                if (this.selectedPieceP != null) {
+                    this.selectedPieceP.rotation.z += Math.PI / 2;
+                    if (this.selectedPieceP.rotation.z > Math.PI * 2) {
+                        this.selectedPieceP.rotation.z = 0;
                     }
                     this.movementPreviewer.update(this.boardP.worldState);
                     this.boardP.prepareScene();
                     // TODO: Add new event
                     if (this.events.onPieceSelectChanged) {
-                        this.events.onPieceSelectChanged(this.selectedPiece);
+                        this.events.onPieceSelectChanged(this.selectedPieceP);
                     }
                 }
             }
@@ -451,6 +500,12 @@ export class ChessEditor {
                 if (this.boardP.cursorMesh.rotation.z > Math.PI * 2) {
                     this.boardP.cursorMesh.rotation.z = 0;
                 }
+            }
+        }
+
+        if (event.keyCode === this.keybinding.QUIT) {
+            if (this.mode === "play" || this.mode === "normal") {
+                this.selectedPiece = null;
             }
         }
     }
