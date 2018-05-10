@@ -1,5 +1,5 @@
 .cond-selector {
-    width: 144px;
+    width: 160px;
     height: 256px;
     background: #333333;
     z-index: 1;
@@ -22,7 +22,7 @@
 }
 
 .cond-selector .condition {
-    width: 120px;
+    width: 140px;
     height: 30px;
     border-radius: 5px;
     background: #5E5E5E;

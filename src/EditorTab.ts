@@ -68,6 +68,8 @@ export class EditorTab extends Tab {
             new ProgrammableCondition("King is dead", `sigma.getPiecesByStateName("King").length===0`),
             new ProgrammableCondition("Been moved",
                 `p.steps>=1`),
+            new ProgrammableCondition("In promotion area",
+                `p.y===0 || p.y+1 === sigma.dims[1]`),
         ];
         this.condSelector.update();
         this.condSelector.visible = true;

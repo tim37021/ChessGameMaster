@@ -5,20 +5,20 @@ interface WorldStateCreateInfo {
 
 export class WorldState {
     private piecesP: Piece[] = new Array();
-    private dims: [number, number];
+    private dimsP: [number, number];
     private steps: number = 0;
 
     constructor(info: WorldStateCreateInfo) {
-        this.dims = info.dims;
+        this.dimsP = info.dims;
     }
 
-    get dimension(): [number, number] {
-        return this.dims;
+    get dims(): [number, number] {
+        return this.dimsP;
     }
 
     public pushPiece(p: Piece): boolean {
-        if (p.x >= 0 && p.x <= this.dims[0]) {
-            if (p.y >= 0 && p.y <= this.dims[1]) {
+        if (p.x >= 0 && p.x <= this.dimsP[0]) {
+            if (p.y >= 0 && p.y <= this.dimsP[1]) {
                 this.piecesP.push(p);
                 return true;
             }

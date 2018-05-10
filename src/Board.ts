@@ -47,8 +47,8 @@ export class Board {
         this.scene.add(this.rollOverMesh);
 
         const w = this.blockWidth;
-        const t = -this.sigma.dimension[0] / 2 * w;
-        const l = -this.sigma.dimension[1] / 2 * w;
+        const t = -this.sigma.dims[0] / 2 * w;
+        const l = -this.sigma.dims[1] / 2 * w;
 
         const pieces = this.sigma.pieces;
         this.scenePieces = [];
@@ -83,8 +83,8 @@ export class Board {
     public intersect(raycaster: THREE.Raycaster): IntersectInfo {
         const objs = raycaster.intersectObjects(this.scenePieces);
         const w = this.blockWidth;
-        const t = -this.sigma.dimension[0] / 2 * 20;
-        const l = -this.sigma.dimension[1] / 2 * 20;
+        const t = -this.sigma.dims[0] / 2 * 20;
+        const l = -this.sigma.dims[1] / 2 * 20;
         if (objs.length > 0) {
             const X = (objs[0].object.position.x - t - w / 2) / w;
             const Y = (objs[0].object.position.y - l - w / 2) / w;
@@ -113,8 +113,8 @@ export class Board {
 
     public set cursorPos(pos: [number, number]) {
         const w = this.blockWidth;
-        const t = -this.sigma.dimension[0] / 2 * w;
-        const l = -this.sigma.dimension[1] / 2 * w;
+        const t = -this.sigma.dims[0] / 2 * w;
+        const l = -this.sigma.dims[1] / 2 * w;
         this.rollOverMesh.position.x = t + pos[0] * w + w / 2;
         this.rollOverMesh.position.y = l + pos[1] * w + w / 2;
         this.cursorPosP = pos;
