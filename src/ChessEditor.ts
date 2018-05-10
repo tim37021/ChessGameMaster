@@ -115,8 +115,8 @@ export class ChessEditor {
                 0, 10 / length, 0, 0,
                 0, 0, 10 / length, 0,
                 0, 0, 0, 1);
-
-            child.geometry.applyMatrix(mat2);
+            const rot = new THREE.Matrix4().makeRotationX(Math.PI / 2);
+            child.geometry.applyMatrix(rot.multiply(mat2));
 
             this.meshes[this.meshes.indexOf(geo)].mesh = child;
             cbk(child);
@@ -439,7 +439,7 @@ export class ChessEditor {
             }
 
             if (this.mode === "placepiece") {
-                this.boardP.cursorMesh.rotation.y += Math.PI / 2;
+                this.boardP.cursorMesh.rotation.z += Math.PI / 2;
             }
         }
     }

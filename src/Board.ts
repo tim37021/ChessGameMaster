@@ -102,8 +102,6 @@ export class Board {
         } else {
             this.rollOverMesh.geometry = this.statesP[idx].mesh.geometry.clone();
             // this.rollOverMesh.geometry = this.statesP[idx].mesh.geometry;
-            // TODO: rotate elsewhere
-            this.rollOverMesh.rotation.x = Math.PI / 2;
             // this.rollOverMesh.rotation.copy(this.states[idx].mesh.rotation);
             this.stateIdx = idx;
         }
