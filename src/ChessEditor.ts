@@ -434,12 +434,23 @@ export class ChessEditor {
             if (this.mode === "normal") {
                 if (this.selectedPiece != null) {
                     this.selectedPiece.rotation.z += Math.PI / 2;
+                    if (this.selectedPiece.rotation.z > Math.PI * 2) {
+                        this.selectedPiece.rotation.z = 0;
+                    }
+                    this.movementPreviewer.update(this.boardP.worldState);
                     this.boardP.prepareScene();
+                    // TODO: Add new event
+                    if (this.events.onPieceSelectChanged) {
+                        this.events.onPieceSelectChanged(this.selectedPiece);
+                    }
                 }
             }
 
             if (this.mode === "placepiece") {
                 this.boardP.cursorMesh.rotation.z += Math.PI / 2;
+                if (this.boardP.cursorMesh.rotation.z > Math.PI * 2) {
+                    this.boardP.cursorMesh.rotation.z = 0;
+                }
             }
         }
     }

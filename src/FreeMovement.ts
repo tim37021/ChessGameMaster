@@ -54,11 +54,16 @@ export class FreeDeltaMovement extends Movement {
 
 
     public getMovePosition(p: Piece): [number, number] {
-        return [p.x + this.dx, p.y + this.dy];
+        const mpos = [this.dx, this.dy];
+        return [p.x + this.round(mpos[0] * Math.cos(p.rotation.z) - mpos[1] * Math.sin(p.rotation.z)),
+        p.y + this.round(mpos[0] * Math.sin(p.rotation.z) + mpos[1] * Math.cos(p.rotation.z))];
+
     }
 
     public getAttackPosition(p: Piece): [number, number] {
-        return [p.x + this.attackDx, p.y + this.attackDy];
+        const mpos = [this.attackDx, this.attackDy];
+        return [p.x + this.round(mpos[0] * Math.cos(p.rotation.z) - mpos[1] * Math.sin(p.rotation.z)),
+        p.y + this.round(mpos[0] * Math.sin(p.rotation.z) + mpos[1] * Math.cos(p.rotation.z))];
     }
 
     public get isAttack(): boolean {
@@ -67,6 +72,10 @@ export class FreeDeltaMovement extends Movement {
 
     public get descrption(): string {
         return `Move by (${this.dx}, ${this.dy})`;
+    }
+
+    private round(v: number): number {
+        return (v >= 0 ? 1 : -1) * Math.round(Math.abs(v));
     }
 }
 

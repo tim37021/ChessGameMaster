@@ -26,15 +26,15 @@ export class ModelPreviewer extends ISelection {
     public set mesh(mesh: THREE.Mesh) {
         this.realMesh = mesh;
         const fake = new THREE.Mesh(mesh.geometry.clone(), (mesh.material as THREE.Material).clone());
-        if (this.scene.children.length > 2) {
-            this.scene.children[2] = fake;
+        if (this.scene.children.length > 3) {
+            this.scene.children[3] = fake;
         } else {
             this.scene.add(fake);
         }
     }
 
     public get mesh(): THREE.Mesh {
-        if (this.scene.children.length > 2) {
+        if (this.scene.children.length > 3) {
             return this.realMesh;
         } else {
             return null;
@@ -64,13 +64,18 @@ export class ModelPreviewer extends ISelection {
         this.scene = new THREE.Scene();
         // setup lighting
         const light = new THREE.DirectionalLight( 0xFFFFFF, 1.0);
+        const light2 = new THREE.AmbientLight(0xFFFFFF, 0.2);
         light.position.set( 1, 1, 1 );
         this.scene.add( light );
+        this.scene.add( light2 );
 
         this.scene.add(new THREE.AxesHelper(100));
 
         this.camera = new THREE.PerspectiveCamera( 45, 1, 1, 3500 );
+        this.camera.position.x = 25;
+        this.camera.position.y = 25;
         this.camera.position.z = 25;
+        this.camera.up.set(0, 0, 1);
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
         this.controls.enablePan = false;
