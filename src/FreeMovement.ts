@@ -54,7 +54,7 @@ export class FreeDeltaMovement extends Movement {
 
         // if next position is within board and there's no piece occupying
         // unless attackPos == movePos
-        return (newxy[0] >= 0 && newxy[0] <= sigma.dimension[0]) && (newxy[1] >= 0 && newxy[1] <= sigma.dimension[1]) &&
+        return (newxy[0] >= 0 && newxy[0] < sigma.dimension[0]) && (newxy[1] >= 0 && newxy[1] < sigma.dimension[1]) &&
             ((this.isAttack && newxy[0] === anewxy[0] && newxy[1] === anewxy[1]) || (sigma.getPiece(newxy) == null));
     }
 

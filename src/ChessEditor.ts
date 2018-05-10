@@ -198,6 +198,7 @@ export class ChessEditor {
         } else if (mode === "play") {
             this.mode = "play";
             this.selectedPiece = null;
+            this.movementPreviewer.scene.visible = true;
             this.movementPreviewer.checkConditions = true;
             this.movementPreviewer.checkMovable = true;
             this.movementPreviewer.piece = null;
@@ -364,8 +365,7 @@ export class ChessEditor {
         }
 
         if (this.mode === "play") {
-            // choose piece and place...
-            if (this.selectedPieceP == null) {
+            const checkPiece = () => {
                 const intersect = this.boardP.intersect(this.raycaster);
                 if (intersect != null) {
                     this.selectedPiece = intersect.p;
@@ -378,6 +378,10 @@ export class ChessEditor {
                     this.movementPreviewer.piece = intersect.p;
                     this.updateMovementPreview();
                 }
+            };
+            // choose piece and place...
+            if (this.selectedPieceP == null) {
+                checkPiece();
             } else {
                 const m = this.movementPreviewer.intersectMovement(this.raycaster);
                 if (m != null) {
@@ -386,6 +390,8 @@ export class ChessEditor {
                     this.movementPreviewer.update(this.boardP.worldState);
                     this.boardP.prepareScene();
                     this.selectedPiece = null;
+                } else {
+                    checkPiece();
                 }
             }
         }
